@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Arial|Montserrat:wght@700&display=swap');
+
+.app-background {
+    background-color: #1e1632;
+}
+
+/* Landing Page */
+.landing-page {
+    height: 100vh;
+}
+
+.landing-header1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 93.5px;
+    font-style: normal;
+    font-weight: bold;
+    letter-spacing: normal;
+    line-height: 102.85px;
+    text-transform: uppercase;
+    color: #FFFFFF;
+}
+
+.landing-header2 {
+    font-family: Arial;
+    font-size: 15.3px;
+    font-style: normal;
+    font-weight: bold;
+    letter-spacing: 0.2px;
+    line-height: normal;
+    text-transform: uppercase;
+    color: #3c78d8;
+}
+
+.landing-page-button {
+    font-family: 'Arial' !important;
+    font-size: 15.3px !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+    line-height: normal !important;
+    text-transform: uppercase !important;
+    margin-top: 15vh !important;
+    background-color: #3c78d8 !important;
+    color: #FFFFFF !important;
+}
