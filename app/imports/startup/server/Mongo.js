@@ -1,18 +1,20 @@
 import { Meteor } from 'meteor/meteor';
-import { Stuffs } from '../../api/stuff/Stuff.js';
+import { Parts } from '../../api/parts/Parts';
 
 /* eslint-disable no-console */
 
+const parts = JSON.parse(Assets.getText('parts.json'));
+
 // Initialize the database with a default data document.
-function addData(data) {
-  console.log(`  Adding: ${data.name} (${data.owner})`);
-  Stuffs.collection.insert(data);
+function addPart(part) {
+  console.log(`  Adding Part: ${part.name}`);
+  Parts.collection.insert(part);
 }
 
 // Initialize the StuffsCollection if empty.
-if (Stuffs.collection.find().count() === 0) {
-  if (Meteor.settings.defaultData) {
-    console.log('Creating default data.');
-    Meteor.settings.defaultData.map(data => addData(data));
+if (Parts.collection.find().count() === 0) {
+  if (parts) {
+    console.log('Creating default parts data.');
+    parts.map(data => addPart(data));
   }
 }
