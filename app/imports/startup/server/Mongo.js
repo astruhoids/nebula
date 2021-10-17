@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import { Parts } from '../../api/parts/Parts';
 
 /* eslint-disable no-console */
