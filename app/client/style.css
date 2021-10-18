@@ -69,3 +69,6 @@
   text-align: right !important;
   color: black !important;
 }
+.taskCard {
+  margin-bottom: 2rem !important;
+}
