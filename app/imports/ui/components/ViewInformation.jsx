@@ -13,21 +13,25 @@ const ViewInformation = ({ part }) => {
       open={open}
       trigger={<Button>View Info.</Button>}
     >
-      <Modal.Header>{part.name}</Modal.Header>
+      <Modal.Header>{part.name} - Status: {part.progress}</Modal.Header>
       <Modal.Content>
         <Grid stackable columns={2}>
           <Grid.Column width={4}>
             <Modal.Description>
               <Header>Details:</Header>
-              <Modal.Content>Quantity: {part.quantity}</Modal.Content>
-              <Modal.Content>Assigned To: {part.assignee}</Modal.Content>
+              <Modal.Content><b>Quantity:</b> {part.quantity}</Modal.Content>
+              <Modal.Content><b>Mechanism:</b> {part.mechanism}</Modal.Content>
+              <Modal.Content><b>Assigned To:</b> {part.assignee}</Modal.Content>
+              <Modal.Content><b>Designer:</b> {part.designer}</Modal.Content>
               <Header>Description:</Header>
-              <Modal.Content>{part.text}</Modal.Content>
+              <Modal.Content>{part.notes}</Modal.Content>
             </Modal.Description>
           </Grid.Column>
           <Grid.Column widht={12}>
             <Modal.Description>
               <Header>Files Attached:</Header>
+              <iframe src={part.pdf} width='100%'></iframe>
+              {part.stl}
             </Modal.Description>
           </Grid.Column>
         </Grid>
