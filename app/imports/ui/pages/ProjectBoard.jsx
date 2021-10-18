@@ -168,13 +168,11 @@ class ProjectBoard extends React.Component {
     return (
       <Container>
         <Header as='h1' textAlign='center'>Project</Header>
-        <Progress percent={this.state.done.length / this.totalIssues * 100} progress success>
-            Issues Completed
-        </Progress>
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Card.Group className='cardGroup'>
             <Card>
               <Card.Content>
+                <Progress percent={this.state.todo.length / this.totalIssues * 100} progress error/>
                 <Card.Header>To Do</Card.Header>
               </Card.Content>
               <Card.Content className='cardPanel'>
@@ -215,6 +213,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
+                <Progress percent={this.state.progress.length / this.totalIssues * 100} progress warning/>
                 <Card.Header>In Progress</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
@@ -255,6 +254,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
+                <Progress percent={this.state.done.length / this.totalIssues * 100} progress success/>
                 <Card.Header>Done</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
