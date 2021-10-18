@@ -192,7 +192,9 @@ class ProjectBoard extends React.Component {
       { key: 'designer', text: 'Designer', value: 'designer' },
     ];
 
-    const partsOnPage = this.props.parts;
+    const partsToDo = _.filter(this.props.parts, (part => part.progress === 'To Do'));
+    this.setState({ todo: this.state.todo.concat(partsToDo) });
+    console.log(this.state.todo.concat(partsToDo));
 
     return (
       <Container>
@@ -227,7 +229,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {this.state.todo.map(({ id, header, text }, index) => (
+                      {this.state.todo.map((id, index) => (
                         <Draggable
                           key={id}
                           draggableId={id}
@@ -238,14 +240,7 @@ class ProjectBoard extends React.Component {
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                             >
-                              <Card>
-                                <Card.Content>
-                                  <Card.Header>{header}</Card.Header>
-                                </Card.Content>
-                                <Card.Content>
-                                  {text}
-                                </Card.Content>
-                              </Card>
+                              <TaskCard key={id} part={id} />
                             </div>
                           )}
                         </Draggable>
@@ -257,9 +252,9 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={(this.state.todo.length / this.totalIssues * 100).toFixed(1)}
+                  percent={((this.state.todo.length / this.totalIssues) * 100).toFixed(1)}
                   progress error
-                  />
+                />
               </Card.Content>
             </Card>
             <Card>
@@ -303,9 +298,9 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={(this.state.progress.length / this.totalIssues * 100).toFixed(1)}
+                  percent={((this.state.progress.length / this.totalIssues) * 100).toFixed(1)}
                   progress warning
-                  />
+                />
               </Card.Content>
             </Card>
             <Card>
@@ -349,9 +344,9 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={(this.state.done.length / this.totalIssues * 100).toFixed(1)}
+                  percent={((this.state.done.length / this.totalIssues) * 100).toFixed(1)}
                   progress success
-                  />
+                />
               </Card.Content>
             </Card>
           </Card.Group>
@@ -367,9 +362,9 @@ ProjectBoard.propTypes = {
 };
 
 export default withTracker(() => {
-  const subscription = Meteor.subscribe('Parts');
+  const subscription = Meteor.subscribe(Parts.userPublicationName);
   const ready = subscription.ready();
-  const parts = Parts.collection.find({}).fetch;
+  const parts = Parts.collection.find({}).fetch();
   return {
     parts,
     ready,
