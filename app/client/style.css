@@ -2,11 +2,17 @@
 
 .app-background {
     background-color: #1e1632;
+    min-height: 100% !important;
+}
+
+.page-container {
+    position: relative;
+    min-height: 100vh;
 }
 
 /* Landing Page */
 .landing-page {
-    height: 100vh;
+    height: 85vh;
 }
 
 .landing-header1 {
@@ -43,6 +49,9 @@
     background-color: #3c78d8 !important;
     color: #FFFFFF !important;
 }
+
+
+/* Project Board */
 .cardPanel {
   min-height: 400px;
   max-height: 400px;

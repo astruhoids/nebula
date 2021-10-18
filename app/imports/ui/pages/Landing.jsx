@@ -8,7 +8,7 @@ class Landing extends React.Component {
     return (
       <Container fluid>
         <Grid verticalAlign='middle' textAlign="center" className="landing-page">
-          <Grid.Column width={8}>
+          <Grid.Column>
             <h3 className="landing-header2">Manage Your Projects With</h3>
             <h1 className="landing-header1">Nebula</h1>
             <Link to='/signin'>
