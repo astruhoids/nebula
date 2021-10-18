@@ -3,3 +3,8 @@
   max-height: 400px;
   overflow-y: auto;
 }
+
+.cardGroup {
+  display: flex;
+  justify-content: space-evenly;
+}

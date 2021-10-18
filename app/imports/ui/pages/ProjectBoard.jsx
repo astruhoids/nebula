@@ -1,6 +1,7 @@
 import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress } from 'semantic-ui-react';
+import _ from 'lodash';
 
 /**
  * Called when card is reorder within the same column.
@@ -106,6 +107,8 @@ class ProjectBoard extends React.Component {
     done: 'done',
   };
 
+  totalIssues = _.sum([this.state.todo.length, this.state.progress.length, this.state.done.length])
+
   // Grabbing list based on the id
   getList = id => this.state[this.idList[id]];
 
@@ -136,9 +139,9 @@ class ProjectBoard extends React.Component {
         state = { done: items };
       }
 
-      this.setState({state});
+      this.setState({ state });
 
-    // Card is placed in a different column from origin
+      // Card is placed in a different column from origin
     } else {
       // Recording column source and destination names
       const columnA = source.droppableId;
@@ -154,6 +157,7 @@ class ProjectBoard extends React.Component {
 
       // Based on which columns were affected, update dynamically with the cards moved
       this.setState({
+
         [columnA]: result.[columnA],
         [columnB]: result.[columnB],
       });
@@ -164,8 +168,11 @@ class ProjectBoard extends React.Component {
     return (
       <Container>
         <Header as='h1' textAlign='center'>Project</Header>
+        <Progress percent={this.state.done.length / this.totalIssues * 100} progress success>
+            Issues Completed
+        </Progress>
         <DragDropContext onDragEnd={this.onDragEnd}>
-          <Card.Group textAlign='center'>
+          <Card.Group className='cardGroup'>
             <Card>
               <Card.Content>
                 <Card.Header>To Do</Card.Header>
