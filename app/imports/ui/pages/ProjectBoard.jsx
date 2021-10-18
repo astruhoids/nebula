@@ -2,6 +2,14 @@ import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { Card, CardContent, Container, Header } from 'semantic-ui-react';
 
+/**
+ * Called when card is reorder within the same column.
+ * 
+ * @param {*} list Array of cards
+ * @param {*} startIndex Beginning index of array
+ * @param {*} endIndex End index of array
+ * @returns Mutated array of the new order for the list
+ */
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
@@ -10,16 +18,31 @@ const reorder = (list, startIndex, endIndex) => {
   return result;
 };
 
-const move = (source, destination, droppableSource, droppableDestination) => {
+/**
+ * Called when a card is moved to a different column from its origin.
+ * Clones both the source and target's list of cards and mutates it to the
+ * desired location.
+ * 
+ * @param {*} source The name of the column a card came from
+ * @param {*} target The name of the column a card shall go
+ * @param {*} droppableSource Reference to the card's source 
+ * @param {*} droppableTarget Reference to the card's target
+ * @returns An object-array that has the modified list of say column A and B.
+ */
+const move = (source, target, droppableSource, droppableTarget) => {
+  // Cloning arrays and recording what has been removed from the source
   const sourceClone = Array.from(source);
-  const destClone = Array.from(destination);
+  const targetClone = Array.from(target);
   const [removed] = sourceClone.splice(droppableSource.index, 1);
-  
-  destClone.splice(droppableDestination.index, 0, removed);
 
-  const result = {};
-  result[droppableSource.droppableId] = sourceClone;
-  result[droppableDestination.droppableId] = destClone;
+  // Inserting the removed card to the target column
+  targetClone.splice(droppableTarget.index, 0, removed);
+
+  // Storing result to object for both source and target
+  const result = {
+    [droppableSource.droppableId]: sourceClone,
+    [droppableTarget.droppableId]: targetClone,
+  };
 
   return result;
 };
@@ -83,18 +106,19 @@ class ProjectBoard extends React.Component {
     done: 'done',
   };
 
+  // Grabbing list based on the id
   getList = id => this.state[this.idList[id]];
 
+  // When user stops dragging (aka releases card)
   onDragEnd = result => {
     const { source, destination } = result;
-    console.log(source);
-    console.log(destination);
 
-    // dropped outside the list
+    // Card dropped in an invalid location
     if (!destination) {
       return;
     }
 
+    // Card was dropped in the same column it came from
     if (source.droppableId === destination.droppableId) {
       const items = reorder(
         this.getList(source.droppableId),
@@ -102,8 +126,9 @@ class ProjectBoard extends React.Component {
         destination.index,
       );
 
+      // Setting the reordered list to be the new list
+      // By default it checks the todo column
       let state = { items };
-      console.log(state);
 
       if (source.droppableId === 'progress') {
         state = { progress: items };
@@ -111,12 +136,15 @@ class ProjectBoard extends React.Component {
         state = { done: items };
       }
 
-      this.setState(state);
+      this.setState({state});
 
+    // Card is placed in a different column from origin
     } else {
+      // Recording column source and destination names
       const columnA = source.droppableId;
       const columnB = destination.droppableId;
 
+      // Calling move to actually move the cards around
       const result = move(
         this.getList(source.droppableId),
         this.getList(destination.droppableId),
@@ -124,6 +152,7 @@ class ProjectBoard extends React.Component {
         destination,
       );
 
+      // Based on which columns were affected, update dynamically with the cards moved
       this.setState({
         [columnA]: result.[columnA],
         [columnB]: result.[columnB],
@@ -146,8 +175,8 @@ class ProjectBoard extends React.Component {
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
+                      style={{ height: '400px' }}
                     >
-                      {provided.placeholder}
                       {this.state.todo.map(({ id, header, text }, index) => (
                         <Draggable
                           key={id}
@@ -171,6 +200,7 @@ class ProjectBoard extends React.Component {
                           )}
                         </Draggable>
                       ))}
+                      {provided.placeholder}
                     </div>
                   )}
                 </Droppable>
@@ -185,6 +215,7 @@ class ProjectBoard extends React.Component {
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
+                      style={{ height: '400px' }}
                     >
                       {this.state.progress.map(({ id, header, text }, index) => (
                         <Draggable
@@ -224,6 +255,7 @@ class ProjectBoard extends React.Component {
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
+                      style={{ height: '400px' }}
                     >
                       {this.state.done.map(({ id, header, text }, index) => (
                         <Draggable
