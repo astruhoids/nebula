@@ -4,8 +4,9 @@ import PropTypes from 'prop-types';
 import { Roles } from 'meteor/alanning:roles';
 import { withTracker } from 'meteor/react-meteor-data';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress, Loader } from 'semantic-ui-react';
 import _ from 'lodash';
+import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
 
 /**
@@ -170,7 +171,32 @@ class ProjectBoard extends React.Component {
     }
   };
 
+  handleSearch = (e, { value }) => this.setState({ value })
+
+  updateSearch(e) {
+    this.setState({ search: e.target.value });
+  }
+
+  /** If the subscription(s) have been received, render the page, otherwise show a loading icon. */
   render() {
+    return (this.props.ready) ? this.renderPage() : <Loader active>Getting data</Loader>;
+  }
+
+  renderPage() {
+    const { value } = this.state;
+
+    console.log(this.props.parts);
+
+    const options = [
+      { key: 'assignee', text: 'Assignee', value: 'assignee' },
+      { key: 'mechanism', text: 'Mechanism', value: 'mechanism' },
+      { key: 'designer', text: 'Designer', value: 'designer' },
+    ];
+
+    // const partsToDo = _.filter(this.props.parts, (part => part.progress === 'To Do'));
+    // this.setState({ todo: this.state.todo.concat(partsToDo) });
+    // console.log(this.state.todo.concat(partsToDo));
+
     return (
       <Container fluid>
         <Header as='h1' textAlign='center' style={{ color: 'white' }}>Project</Header>
@@ -187,7 +213,9 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
+
                       {this.state.todo.map(({ id, header, text }, index) => (
+                      // {this.state.todo.map(({id}, index) => (
                         <Draggable
                           key={id}
                           draggableId={id}
@@ -199,6 +227,7 @@ class ProjectBoard extends React.Component {
                               {...providedItem.dragHandleProps}
                             >
                               <TaskCard part={{ name: header, text: text, quantity: 3, assignee: 'john' }}/>
+                              {/* <TaskCard key={`${id}+100`} part={id} /> */}
                             </div>
                           )}
                         </Draggable>
@@ -348,8 +377,13 @@ ProjectBoard.propTypes = {
 export default withTracker(() => {
   // Check if the current user is in the admin role
   const currentUser = Roles.userIsInRole(Meteor.userId(), 'admin');
-
+  const subscription = Meteor.subscribe(Parts.userPublicationName);
+  const ready = subscription.ready();
+  const parts = Parts.collection.find({}).fetch();
+  console.log(parts);
   return {
     currentUser,
+    parts,
+    ready,
   };
 })(ProjectBoard);
