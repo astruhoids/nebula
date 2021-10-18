@@ -56,11 +56,6 @@ body {
   overflow-y: auto;
 }
 
-.cardGroup {
-  display: flex;
-  justify-content: space-evenly;
-}
-
 .ui.progress .bar > .progress {
   left: 0.5em !important;
   text-align: right !important;

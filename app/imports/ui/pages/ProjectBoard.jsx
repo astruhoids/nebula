@@ -1,4 +1,8 @@
 import React from 'react';
+import { Meteor } from 'meteor/meteor';
+import PropTypes from 'prop-types';
+import { Roles } from 'meteor/alanning:roles';
+import { withTracker } from 'meteor/react-meteor-data';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { Card, CardContent, Container, Header, Progress } from 'semantic-ui-react';
 import _ from 'lodash';
@@ -92,6 +96,7 @@ class ProjectBoard extends React.Component {
         text: 'test3',
       },
     ],
+    review: [],
     done: [
       {
         id: 'test2',
@@ -104,6 +109,7 @@ class ProjectBoard extends React.Component {
   idList = {
     todo: 'todo',
     progress: 'progress',
+    review: 'review',
     done: 'done',
   };
 
@@ -148,7 +154,7 @@ class ProjectBoard extends React.Component {
       const columnB = destination.droppableId;
 
       // Calling move to actually move the cards around
-      const result = move(
+      const output = move(
         this.getList(source.droppableId),
         this.getList(destination.droppableId),
         source,
@@ -158,20 +164,18 @@ class ProjectBoard extends React.Component {
       // Based on which columns were affected, update dynamically with the cards moved
       this.setState({
 
-        [columnA]: result[columnA],
-        [columnB]: result[columnB],
+        [columnA]: output[columnA],
+        [columnB]: output[columnB],
       });
     }
   };
 
   render() {
-    // const [open, setOpen] = useState(false);
-
     return (
-      <Container>
+      <Container fluid>
         <Header as='h1' textAlign='center'>Project</Header>
         <DragDropContext onDragEnd={this.onDragEnd}>
-          <Card.Group className='cardGroup'>
+          <Card.Group centered>
             <Card>
               <Card.Content>
                 <Card.Header>To Do</Card.Header>
@@ -188,11 +192,11 @@ class ProjectBoard extends React.Component {
                           key={id}
                           draggableId={id}
                           index={index}>
-                          {(provided) => (
+                          {(providedItem) => (
                             <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedItem.innerRef}
+                              {...providedItem.draggableProps}
+                              {...providedItem.dragHandleProps}
                             >
                               <Card>
                                 <Card.Content>
@@ -214,7 +218,7 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={(this.state.todo.length / this.totalIssues * 100).toFixed(1)}
+                  percent={((this.state.todo.length / this.totalIssues) * 100).toFixed(1)}
                   progress error
                 />
               </Card.Content>
@@ -235,11 +239,11 @@ class ProjectBoard extends React.Component {
                           key={id}
                           draggableId={id}
                           index={index}>
-                          {(provided) => (
+                          {(providedItem) => (
                             <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedItem.innerRef}
+                              {...providedItem.draggableProps}
+                              {...providedItem.dragHandleProps}
                             >
                               <Card>
                                 <Card.Content>
@@ -261,17 +265,64 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={(this.state.progress.length / this.totalIssues * 100).toFixed(1)}
+                  percent={((this.state.progress.length / this.totalIssues) * 100).toFixed(1)}
                   progress warning
                 />
               </Card.Content>
             </Card>
             <Card>
               <CardContent>
-                <Card.Header>Done</Card.Header>
+                <Card.Header>For Review</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
-                <Droppable droppableId='done'>
+                <Droppable droppableId='review'>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      style={{ height: '400px' }}
+                    >
+                      {this.state.review.map(({ id, header, text }, index) => (
+                        <Draggable
+                          key={id}
+                          draggableId={id}
+                          index={index}>
+                          {(providedItem) => (
+                            <div
+                              ref={providedItem.innerRef}
+                              {...providedItem.draggableProps}
+                              {...providedItem.dragHandleProps}
+                            >
+                              <Card>
+                                <Card.Content>
+                                  <Card.Header>{header}</Card.Header>
+                                </Card.Content>
+                                <Card.Content>
+                                  {text}
+                                  <ViewInformation header={header} text={text} />
+                                </Card.Content>
+                              </Card>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </Card.Content>
+              <Card.Content>
+                <Progress className="no-margin"
+                  percent={((this.state.review.length / this.totalIssues) * 100).toFixed(1)}
+                  progress color={'olive'}
+                />
+              </Card.Content>
+            </Card>
+            <Card>
+              <CardContent>
+                <Card.Header>Done (Advisor Only)</Card.Header>
+              </CardContent>
+              <Card.Content className='cardPanel'>
+                <Droppable droppableId='done' isDropDisabled={!this.props.currentUser}>
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
@@ -281,12 +332,14 @@ class ProjectBoard extends React.Component {
                         <Draggable
                           key={id}
                           draggableId={id}
-                          index={index}>
-                          {(provided) => (
+                          index={index}
+                          isDragDisabled={!this.props.currentUser}
+                        >
+                          {(providedItem) => (
                             <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedItem.innerRef}
+                              {...providedItem.draggableProps}
+                              {...providedItem.dragHandleProps}
                             >
                               <Card>
                                 <Card.Content>
@@ -308,7 +361,7 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={(this.state.done.length / this.totalIssues * 100).toFixed(1)}
+                  percent={((this.state.done.length / this.totalIssues) * 100).toFixed(1)}
                   progress success
                 />
               </Card.Content>
@@ -318,7 +371,17 @@ class ProjectBoard extends React.Component {
       </Container>
     );
   }
-
 }
 
-export default ProjectBoard;
+ProjectBoard.propTypes = {
+  currentUser: PropTypes.bool.isRequired,
+};
+
+export default withTracker(() => {
+  // Check if the current user is in the admin role
+  const currentUser = Roles.userIsInRole(Meteor.userId(), 'admin');
+
+  return {
+    currentUser,
+  };
+})(ProjectBoard);
