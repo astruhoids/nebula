@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 
 /** Is shown on the project page. Represents a task to create a part */
 class TaskCard extends React.Component {
@@ -20,7 +21,7 @@ class TaskCard extends React.Component {
 }
 
 TaskCard.propTypes = {
-  part: PropTypes.object.isRequired
+  part: PropTypes.object.isRequired,
 };
 
-export default TaskCard;
+export default withRouter(TaskCard);

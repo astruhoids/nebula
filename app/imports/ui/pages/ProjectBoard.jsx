@@ -1,11 +1,16 @@
 import React from 'react';
+import { Meteor } from 'meteor/meteor';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress, Loader, Form } from 'semantic-ui-react';
+import { withTracker } from 'meteor/react-meteor-data';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
+import { Parts } from '../../api/parts/Parts';
+import TaskCard from '../components/TaskCard';
 
 /**
  * Called when card is reorder within the same column.
- * 
+ *
  * @param {*} list Array of cards
  * @param {*} startIndex Beginning index of array
  * @param {*} endIndex End index of array
@@ -23,14 +28,15 @@ const reorder = (list, startIndex, endIndex) => {
  * Called when a card is moved to a different column from its origin.
  * Clones both the source and target's list of cards and mutates it to the
  * desired location.
- * 
+ *
  * @param {*} source The name of the column a card came from
  * @param {*} target The name of the column a card shall go
- * @param {*} droppableSource Reference to the card's source 
+ * @param {*} droppableSource Reference to the card's source
  * @param {*} droppableTarget Reference to the card's target
  * @returns An object-array that has the modified list of say column A and B.
  */
 const move = (source, target, droppableSource, droppableTarget) => {
+
   // Cloning arrays and recording what has been removed from the source
   const sourceClone = Array.from(source);
   const targetClone = Array.from(target);
@@ -79,6 +85,8 @@ class ProjectBoard extends React.Component {
   ];
 
   state = {
+    value: '',
+    search: '',
     todo: this.list,
     progress: [
       {
@@ -164,15 +172,53 @@ class ProjectBoard extends React.Component {
     }
   };
 
+  handleSearch = (e, { value }) => this.setState({ value })
+
+  updateSearch(e) {
+    this.setState({ search: e.target.value });
+  }
+
+  /** If the subscription(s) have been received, render the page, otherwise show a loading icon. */
+  // render() {
+  //   return (this.props.ready) ? this.renderPage() : <Loader active>Getting data</Loader>;
+  // }
+
   render() {
+    const { value } = this.state;
+
+    const options = [
+      { key: 'assignee', text: 'Assignee', value: 'assignee' },
+      { key: 'mechanism', text: 'Mechanism', value: 'mechanism' },
+      { key: 'designer', text: 'Designer', value: 'designer' },
+    ];
+
+    const partsOnPage = this.props.parts;
+
     return (
       <Container>
-        <Header as='h1' textAlign='center'>Project</Header>
+        <Header as='h1' textAlign='center' style={{ paddingTop: '15px', color: 'white' }}>Project</Header>
+        <Form size='large'>
+          <Form.Group widths='equal'>
+            <Form.Select
+              placeholder='Select Filter'
+              value={value}
+              onChange={this.handleSearch}
+              options={options}
+            />
+            <Form.Input
+              onChange={this.updateSearch.bind(this)}
+              name='search'
+              className='icon'
+              icon='search'
+              placeholder='Search Parts'
+            />
+          </Form.Group>
+        </Form>
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Card.Group className='cardGroup'>
             <Card>
               <Card.Content>
-                <Progress percent={this.state.todo.length / this.totalIssues * 100} progress error/>
+                <Progress percent={(this.state.todo.length / this.totalIssues) * 100} progress error/>
                 <Card.Header>To Do</Card.Header>
               </Card.Content>
               <Card.Content className='cardPanel'>
@@ -213,7 +259,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
-                <Progress percent={this.state.progress.length / this.totalIssues * 100} progress warning/>
+                <Progress percent={(this.state.progress.length / this.totalIssues) * 100} progress warning/>
                 <Card.Header>In Progress</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
@@ -254,7 +300,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
-                <Progress percent={this.state.done.length / this.totalIssues * 100} progress success/>
+                <Progress percent={(this.state.done.length / this.totalIssues) * 100} progress success/>
                 <Card.Header>Done</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
@@ -298,7 +344,19 @@ class ProjectBoard extends React.Component {
       </Container>
     );
   }
-
 }
 
-export default ProjectBoard;
+ProjectBoard.propTypes = {
+  parts: PropTypes.array.isRequired,
+  ready: PropTypes.bool.isRequired,
+};
+
+export default withTracker(() => {
+  const subscription = Meteor.subscribe('Parts');
+  const ready = subscription.ready();
+  const parts = Parts.collection.find({}).fetch;
+  return {
+    parts,
+    ready,
+  };
+})(ProjectBoard);
