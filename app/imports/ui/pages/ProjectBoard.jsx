@@ -1,11 +1,11 @@
 import React from 'react';
 import { Meteor } from 'meteor/meteor';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress, Loader, Form } from 'semantic-ui-react';
-import { withTracker } from 'meteor/react-meteor-data';
 import PropTypes from 'prop-types';
+import { Roles } from 'meteor/alanning:roles';
+import { withTracker } from 'meteor/react-meteor-data';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { Card, CardContent, Container, Header, Progress } from 'semantic-ui-react';
 import _ from 'lodash';
-import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
 
 /**
@@ -36,7 +36,6 @@ const reorder = (list, startIndex, endIndex) => {
  * @returns An object-array that has the modified list of say column A and B.
  */
 const move = (source, target, droppableSource, droppableTarget) => {
-
   // Cloning arrays and recording what has been removed from the source
   const sourceClone = Array.from(source);
   const targetClone = Array.from(target);
@@ -55,7 +54,6 @@ const move = (source, target, droppableSource, droppableTarget) => {
 };
 
 class ProjectBoard extends React.Component {
-
   list = [
     {
       id: 'issue1',
@@ -85,8 +83,6 @@ class ProjectBoard extends React.Component {
   ];
 
   state = {
-    value: '',
-    search: '',
     todo: this.list,
     progress: [
       {
@@ -100,6 +96,7 @@ class ProjectBoard extends React.Component {
         text: 'test3',
       },
     ],
+    review: [],
     done: [
       {
         id: 'test2',
@@ -112,6 +109,7 @@ class ProjectBoard extends React.Component {
   idList = {
     todo: 'todo',
     progress: 'progress',
+    review: 'review',
     done: 'done',
   };
 
@@ -156,7 +154,7 @@ class ProjectBoard extends React.Component {
       const columnB = destination.droppableId;
 
       // Calling move to actually move the cards around
-      const result = move(
+      const output = move(
         this.getList(source.droppableId),
         this.getList(destination.droppableId),
         source,
@@ -166,58 +164,18 @@ class ProjectBoard extends React.Component {
       // Based on which columns were affected, update dynamically with the cards moved
       this.setState({
 
-        [columnA]: result[columnA],
-        [columnB]: result[columnB],
+        [columnA]: output[columnA],
+        [columnB]: output[columnB],
       });
     }
   };
 
-  handleSearch = (e, { value }) => this.setState({ value })
-
-  updateSearch(e) {
-    this.setState({ search: e.target.value });
-  }
-
-  /** If the subscription(s) have been received, render the page, otherwise show a loading icon. */
-  // render() {
-  //   return (this.props.ready) ? this.renderPage() : <Loader active>Getting data</Loader>;
-  // }
-
   render() {
-    const { value } = this.state;
-
-    const options = [
-      { key: 'assignee', text: 'Assignee', value: 'assignee' },
-      { key: 'mechanism', text: 'Mechanism', value: 'mechanism' },
-      { key: 'designer', text: 'Designer', value: 'designer' },
-    ];
-
-    const partsToDo = _.filter(this.props.parts, (part => part.progress === 'To Do'));
-    this.setState({ todo: this.state.todo.concat(partsToDo) });
-    console.log(this.state.todo.concat(partsToDo));
-
     return (
-      <Container>
-        <Header as='h1' textAlign='center' style={{ paddingTop: '15px', color: 'white' }}>Project</Header>
-        <Form size='large'>
-          <Form.Group widths='equal'>
-            <Form.Select
-              placeholder='Select Filter'
-              value={value}
-              onChange={this.handleSearch}
-              options={options}
-            />
-            <Form.Input
-              onChange={this.updateSearch.bind(this)}
-              name='search'
-              className='icon'
-              icon='search'
-              placeholder='Search Parts'
-            />
-          </Form.Group>
-        </Form>
+      <Container fluid>
+        <Header as='h1' textAlign='center' style={{ color: 'white' }}>Project</Header>
         <DragDropContext onDragEnd={this.onDragEnd}>
-          <Card.Group className='cardGroup'>
+          <Card.Group centered>
             <Card>
               <Card.Content>
                 <Card.Header>To Do</Card.Header>
@@ -229,18 +187,18 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {this.state.todo.map((id, index) => (
+                      {this.state.todo.map(({ id, header, text }, index) => (
                         <Draggable
                           key={id}
                           draggableId={id}
                           index={index}>
-                          {(provided) => (
+                          {(providedItem) => (
                             <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedItem.innerRef}
+                              {...providedItem.draggableProps}
+                              {...providedItem.dragHandleProps}
                             >
-                              <TaskCard key={id} part={id} />
+                              <TaskCard part={{ name: header, text: text, quantity: 3, assignee: 'john' }}/>
                             </div>
                           )}
                         </Draggable>
@@ -273,20 +231,13 @@ class ProjectBoard extends React.Component {
                           key={id}
                           draggableId={id}
                           index={index}>
-                          {(provided) => (
+                          {(providedItem) => (
                             <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedItem.innerRef}
+                              {...providedItem.draggableProps}
+                              {...providedItem.dragHandleProps}
                             >
-                              <Card>
-                                <Card.Content>
-                                  <Card.Header>{header}</Card.Header>
-                                </Card.Content>
-                                <Card.Content>
-                                  {text}
-                                </Card.Content>
-                              </Card>
+                              <TaskCard part={{ name: header, text: text, quantity: 3, assignee: 'john' }}/>
                             </div>
                           )}
                         </Draggable>
@@ -305,10 +256,49 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
-                <Card.Header>Done</Card.Header>
+                <Card.Header>For Review</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
-                <Droppable droppableId='done'>
+                <Droppable droppableId='review'>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      style={{ height: '400px' }}
+                    >
+                      {this.state.review.map(({ id, header, text }, index) => (
+                        <Draggable
+                          key={id}
+                          draggableId={id}
+                          index={index}>
+                          {(providedItem) => (
+                            <div
+                              ref={providedItem.innerRef}
+                              {...providedItem.draggableProps}
+                              {...providedItem.dragHandleProps}
+                            >
+                              <TaskCard part={{ name: header, text: text, quantity: 3, assignee: 'john' }}/>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </Card.Content>
+              <Card.Content>
+                <Progress className="no-margin"
+                  percent={((this.state.review.length / this.totalIssues) * 100).toFixed(1)}
+                  progress color={'olive'}
+                />
+              </Card.Content>
+            </Card>
+            <Card>
+              <CardContent>
+                <Card.Header>Done (Advisor Only)</Card.Header>
+              </CardContent>
+              <Card.Content className='cardPanel'>
+                <Droppable droppableId='done' isDropDisabled={!this.props.currentUser}>
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
@@ -318,21 +308,16 @@ class ProjectBoard extends React.Component {
                         <Draggable
                           key={id}
                           draggableId={id}
-                          index={index}>
-                          {(provided) => (
+                          index={index}
+                          isDragDisabled={!this.props.currentUser}
+                        >
+                          {(providedItem) => (
                             <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedItem.innerRef}
+                              {...providedItem.draggableProps}
+                              {...providedItem.dragHandleProps}
                             >
-                              <Card>
-                                <Card.Content>
-                                  <Card.Header>{header}</Card.Header>
-                                </Card.Content>
-                                <Card.Content>
-                                  {text}
-                                </Card.Content>
-                              </Card>
+                              <TaskCard part={{ name: header, text: text, quantity: 3, assignee: 'john' }}/>
                             </div>
                           )}
                         </Draggable>
@@ -357,16 +342,14 @@ class ProjectBoard extends React.Component {
 }
 
 ProjectBoard.propTypes = {
-  parts: PropTypes.array.isRequired,
-  ready: PropTypes.bool.isRequired,
+  currentUser: PropTypes.bool.isRequired,
 };
 
 export default withTracker(() => {
-  const subscription = Meteor.subscribe(Parts.userPublicationName);
-  const ready = subscription.ready();
-  const parts = Parts.collection.find({}).fetch();
+  // Check if the current user is in the admin role
+  const currentUser = Roles.userIsInRole(Meteor.userId(), 'admin');
+
   return {
-    parts,
-    ready,
+    currentUser,
   };
 })(ProjectBoard);
