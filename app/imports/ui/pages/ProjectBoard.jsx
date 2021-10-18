@@ -172,7 +172,6 @@ class ProjectBoard extends React.Component {
           <Card.Group className='cardGroup'>
             <Card>
               <Card.Content>
-                <Progress percent={this.state.todo.length / this.totalIssues * 100} progress error/>
                 <Card.Header>To Do</Card.Header>
               </Card.Content>
               <Card.Content className='cardPanel'>
@@ -210,10 +209,15 @@ class ProjectBoard extends React.Component {
                   )}
                 </Droppable>
               </Card.Content>
+              <Card.Content>
+                <Progress className="no-margin"
+                  percent={(this.state.todo.length / this.totalIssues * 100).toFixed(1)}
+                  progress error
+                  />
+              </Card.Content>
             </Card>
             <Card>
               <CardContent>
-                <Progress percent={this.state.progress.length / this.totalIssues * 100} progress warning/>
                 <Card.Header>In Progress</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
@@ -251,10 +255,15 @@ class ProjectBoard extends React.Component {
                   )}
                 </Droppable>
               </Card.Content>
+              <Card.Content>
+                <Progress className="no-margin"
+                  percent={(this.state.progress.length / this.totalIssues * 100).toFixed(1)}
+                  progress warning
+                  />
+              </Card.Content>
             </Card>
             <Card>
               <CardContent>
-                <Progress percent={this.state.done.length / this.totalIssues * 100} progress success/>
                 <Card.Header>Done</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
@@ -291,6 +300,12 @@ class ProjectBoard extends React.Component {
                     </div>
                   )}
                 </Droppable>
+              </Card.Content>
+              <Card.Content>
+                <Progress className="no-margin"
+                  percent={(this.state.done.length / this.totalIssues * 100).toFixed(1)}
+                  progress success
+                  />
               </Card.Content>
             </Card>
           </Card.Group>
