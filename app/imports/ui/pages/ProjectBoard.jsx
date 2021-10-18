@@ -158,8 +158,8 @@ class ProjectBoard extends React.Component {
       // Based on which columns were affected, update dynamically with the cards moved
       this.setState({
 
-        [columnA]: result.[columnA],
-        [columnB]: result.[columnB],
+        [columnA]: result[columnA],
+        [columnB]: result[columnB],
       });
     }
   };
