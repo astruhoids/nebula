@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Button } from 'semantic-ui-react';
+import { Modal, Button, Header, Grid } from 'semantic-ui-react';
 
-const ViewInformation = ({ header, text }) => {
+const ViewInformation = ({ part }) => {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -13,28 +13,35 @@ const ViewInformation = ({ header, text }) => {
       open={open}
       trigger={<Button>View Info.</Button>}
     >
-      <Modal.Header>{header}</Modal.Header>
+      <Modal.Header>{part.name}</Modal.Header>
       <Modal.Content>
-        {text}
+        <Grid stackable columns={2}>
+          <Grid.Column width={4}>
+            <Modal.Description>
+              <Header>Details:</Header>
+              <Modal.Content>Quantity: {part.quantity}</Modal.Content>
+              <Modal.Content>Assigned To: {part.assignee}</Modal.Content>
+              <Header>Description:</Header>
+              <Modal.Content>{part.text}</Modal.Content>
+            </Modal.Description>
+          </Grid.Column>
+          <Grid.Column widht={12}>
+            <Modal.Description>
+              <Header>Files Attached:</Header>
+            </Modal.Description>
+          </Grid.Column>
+        </Grid>
       </Modal.Content>
       <Modal.Actions>
-        <Button color='red' onClick={() => setOpen(false)}>
-          Cancel
+        <Button color='black' onClick={() => setOpen(false)}>
+          Close
         </Button>
-        <Button
-          content='Create'
-          labelPosition='right'
-          icon='checkmark'
-          onClick={() => setOpen(false)}
-          positive
-        />
       </Modal.Actions>
-    </Modal>
+    </Modal >
   );
 };
 ViewInformation.propTypes = {
-  header: PropTypes.string,
-  text: PropTypes.string,
+  part: PropTypes.object.isRequired,
 };
 
 export default ViewInformation;

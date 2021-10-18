@@ -6,7 +6,7 @@ import { withTracker } from 'meteor/react-meteor-data';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { Card, CardContent, Container, Header, Progress } from 'semantic-ui-react';
 import _ from 'lodash';
-import ViewInformation from '../components/ViewInformation';
+import TaskCard from '../components/TaskCard';
 
 /**
  * Called when card is reorder within the same column.
@@ -173,7 +173,7 @@ class ProjectBoard extends React.Component {
   render() {
     return (
       <Container fluid>
-        <Header as='h1' textAlign='center'>Project</Header>
+        <Header as='h1' textAlign='center' style={{ color: 'white' }}>Project</Header>
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Card.Group centered>
             <Card>
@@ -198,15 +198,7 @@ class ProjectBoard extends React.Component {
                               {...providedItem.draggableProps}
                               {...providedItem.dragHandleProps}
                             >
-                              <Card>
-                                <Card.Content>
-                                  <Card.Header>{header}</Card.Header>
-                                </Card.Content>
-                                <Card.Content>
-                                  {text}
-                                  <ViewInformation header={header} text={text} />
-                                </Card.Content>
-                              </Card>
+                              <TaskCard part={{ name: header, text: text, quantity: 3, assignee: 'john' }}/>
                             </div>
                           )}
                         </Draggable>
@@ -245,15 +237,7 @@ class ProjectBoard extends React.Component {
                               {...providedItem.draggableProps}
                               {...providedItem.dragHandleProps}
                             >
-                              <Card>
-                                <Card.Content>
-                                  <Card.Header>{header}</Card.Header>
-                                </Card.Content>
-                                <Card.Content>
-                                  {text}
-                                  <ViewInformation header={header} text={text} />
-                                </Card.Content>
-                              </Card>
+                              <TaskCard part={{ name: header, text: text, quantity: 3, assignee: 'john' }}/>
                             </div>
                           )}
                         </Draggable>
@@ -292,15 +276,7 @@ class ProjectBoard extends React.Component {
                               {...providedItem.draggableProps}
                               {...providedItem.dragHandleProps}
                             >
-                              <Card>
-                                <Card.Content>
-                                  <Card.Header>{header}</Card.Header>
-                                </Card.Content>
-                                <Card.Content>
-                                  {text}
-                                  <ViewInformation header={header} text={text} />
-                                </Card.Content>
-                              </Card>
+                              <TaskCard part={{ name: header, text: text, quantity: 3, assignee: 'john' }}/>
                             </div>
                           )}
                         </Draggable>
@@ -341,15 +317,7 @@ class ProjectBoard extends React.Component {
                               {...providedItem.draggableProps}
                               {...providedItem.dragHandleProps}
                             >
-                              <Card>
-                                <Card.Content>
-                                  <Card.Header>{header}</Card.Header>
-                                </Card.Content>
-                                <Card.Content>
-                                  {text}
-                                  <ViewInformation header={header} text={text} />
-                                </Card.Content>
-                              </Card>
+                              <TaskCard part={{ name: header, text: text, quantity: 3, assignee: 'john' }}/>
                             </div>
                           )}
                         </Draggable>
