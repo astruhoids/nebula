@@ -2,10 +2,11 @@ import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { Card, CardContent, Container, Header, Progress } from 'semantic-ui-react';
 import _ from 'lodash';
+import ViewInformation from '../components/ViewInformation';
 
 /**
  * Called when card is reorder within the same column.
- * 
+ *
  * @param {*} list Array of cards
  * @param {*} startIndex Beginning index of array
  * @param {*} endIndex End index of array
@@ -23,10 +24,10 @@ const reorder = (list, startIndex, endIndex) => {
  * Called when a card is moved to a different column from its origin.
  * Clones both the source and target's list of cards and mutates it to the
  * desired location.
- * 
+ *
  * @param {*} source The name of the column a card came from
  * @param {*} target The name of the column a card shall go
- * @param {*} droppableSource Reference to the card's source 
+ * @param {*} droppableSource Reference to the card's source
  * @param {*} droppableTarget Reference to the card's target
  * @returns An object-array that has the modified list of say column A and B.
  */
@@ -49,7 +50,6 @@ const move = (source, target, droppableSource, droppableTarget) => {
 };
 
 class ProjectBoard extends React.Component {
-
   list = [
     {
       id: 'issue1',
@@ -165,6 +165,8 @@ class ProjectBoard extends React.Component {
   };
 
   render() {
+    // const [open, setOpen] = useState(false);
+
     return (
       <Container>
         <Header as='h1' textAlign='center'>Project</Header>
@@ -198,6 +200,7 @@ class ProjectBoard extends React.Component {
                                 </Card.Content>
                                 <Card.Content>
                                   {text}
+                                  <ViewInformation header={header} text={text} />
                                 </Card.Content>
                               </Card>
                             </div>
@@ -213,7 +216,7 @@ class ProjectBoard extends React.Component {
                 <Progress className="no-margin"
                   percent={(this.state.todo.length / this.totalIssues * 100).toFixed(1)}
                   progress error
-                  />
+                />
               </Card.Content>
             </Card>
             <Card>
@@ -244,6 +247,7 @@ class ProjectBoard extends React.Component {
                                 </Card.Content>
                                 <Card.Content>
                                   {text}
+                                  <ViewInformation header={header} text={text} />
                                 </Card.Content>
                               </Card>
                             </div>
@@ -259,7 +263,7 @@ class ProjectBoard extends React.Component {
                 <Progress className="no-margin"
                   percent={(this.state.progress.length / this.totalIssues * 100).toFixed(1)}
                   progress warning
-                  />
+                />
               </Card.Content>
             </Card>
             <Card>
@@ -290,6 +294,7 @@ class ProjectBoard extends React.Component {
                                 </Card.Content>
                                 <Card.Content>
                                   {text}
+                                  <ViewInformation header={header} text={text} />
                                 </Card.Content>
                               </Card>
                             </div>
@@ -305,7 +310,7 @@ class ProjectBoard extends React.Component {
                 <Progress className="no-margin"
                   percent={(this.state.done.length / this.totalIssues * 100).toFixed(1)}
                   progress success
-                  />
+                />
               </Card.Content>
             </Card>
           </Card.Group>
