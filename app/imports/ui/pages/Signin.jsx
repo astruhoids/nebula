@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link, Redirect } from 'react-router-dom';
 import { Meteor } from 'meteor/meteor';
-import { Container, Form, Grid, Header, Message, Segment } from 'semantic-ui-react';
+import { Container, Form, Grid, Header, Image, Message, Segment } from 'semantic-ui-react';
 
 /**
  * Signin page overrides the form’s submit event and call Meteor’s loginWithPassword().
@@ -42,14 +42,15 @@ export default class Signin extends React.Component {
     }
     // Otherwise return the Login form.
     return (
-      <Container id="signin-page">
-        <Grid textAlign="center" verticalAlign="middle" centered columns={2}>
+      <Container>
+        <Grid textAlign="center" verticalAlign="middle" style={{ height: '75vh' }} centered columns={2}>
           <Grid.Column>
-            <Header as="h2" textAlign="center">
-              Login to your account
-            </Header>
             <Form onSubmit={this.submit}>
               <Segment stacked>
+                <Image src='images/nebula-logo.png' centered />
+                <Header as="h2" textAlign="center" style={{ marginTop: '-20px' }}>
+                  Login to your account
+                </Header>
                 <Form.Input
                   label="Email"
                   id="signin-form-email"
@@ -70,12 +71,12 @@ export default class Signin extends React.Component {
                   type="password"
                   onChange={this.handleChange}
                 />
-                <Form.Button id="signin-form-submit" content="Submit"/>
+                <Form.Button fluid content="Login" style={{ backgroundColor: '#3c78d8', color: '#FFFFFF' }}/>
+                <Link to="/signup">
+                  <Form.Button fluid content="Not Registered?"/>
+                </Link>
               </Segment>
             </Form>
-            <Message>
-              <Link to="/signup">Click here to Register</Link>
-            </Message>
             {this.state.error === '' ? (
               ''
             ) : (
