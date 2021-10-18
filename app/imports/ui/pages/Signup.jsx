@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link, Redirect } from 'react-router-dom';
-import { Container, Form, Grid, Header, Message, Segment } from 'semantic-ui-react';
+import { Container, Form, Grid, Header, Image, Message, Segment } from 'semantic-ui-react';
 import { Accounts } from 'meteor/accounts-base';
 
 /**
@@ -40,13 +40,14 @@ class Signup extends React.Component {
     }
     return (
       <Container id="signup-page">
-        <Grid textAlign="center" verticalAlign="middle" centered columns={2}>
+        <Grid textAlign="center" verticalAlign="middle" style={{ height: '75vh' }} centered columns={2}>
           <Grid.Column>
-            <Header as="h2" textAlign="center">
-              Register your account
-            </Header>
             <Form onSubmit={this.submit}>
               <Segment stacked>
+                <Image src='images/nebula-logo.png' centered />
+                <Header as="h2" textAlign="center" style={{ marginTop: '-20px' }}>
+                  Sign Up For Nebula
+                </Header>
                 <Form.Input
                   label="Email"
                   id="signup-form-email"
@@ -67,12 +68,12 @@ class Signup extends React.Component {
                   type="password"
                   onChange={this.handleChange}
                 />
-                <Form.Button id="signup-form-submit" content="Submit"/>
+                <Form.Button fluid content="Sign Up" style={{ backgroundColor: '#3c78d8', color: '#FFFFFF' }}/>
+                <Link to="/signin">
+                  <Form.Button fluid content="Already Have an Account?"/>
+                </Link>
               </Segment>
             </Form>
-            <Message>
-              Already have an account? Login <Link to="/signin">here</Link>
-            </Message>
             {this.state.error === '' ? (
               ''
             ) : (
