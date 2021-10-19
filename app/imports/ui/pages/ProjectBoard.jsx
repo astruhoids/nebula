@@ -293,22 +293,17 @@ class ProjectBoard extends React.Component {
                       <Grid.Column floated="left" width={11}>
                         To Do
                       </Grid.Column>
-                      <Grid.Column floated="left" >
+                      {this.props.currentUser ?
+                      (<Grid.Column floated="left" >
                         <Button 
                           as={NavLink}
-                          style={{ margin: '0 0 0 0'}}
                           to='add'
                           size='mini'
                           icon='plus' />
-                      </Grid.Column>
+                      </Grid.Column>) : ''}
                     </Grid.Row>
                   </Grid>
                 </Card.Header>
-                {/* {this.props.currentUser ? */}
-                  {/* <Button as={NavLink} to='add' size='mini' icon='plus' /> */}
-                  {/* : */}
-                  {/* '' */}
-                {/* } */}
               </Card.Content>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId="todo">
