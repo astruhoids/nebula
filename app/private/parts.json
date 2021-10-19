@@ -12,6 +12,17 @@
     "year": "2021"
   },
   {
+    "name": "Another ToDo",
+    "quantity": "4",
+    "assignee": ["John"],
+    "designer": "admin@foo.com",
+    "mechanism": ["Another Mechanism"],
+    "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.pdf",
+    "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.STL",
+    "notes": "3D Printer has no filament atm",
+    "progress": "To Do"
+  },
+  {
     "name": "Part2",
     "quantity": "2",
     "assignee": ["Admin"],
@@ -20,7 +31,28 @@
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
     "notes": "Needs to be plasma cut",
-    "status": "In Progress",
-    "year": "2021"
+    "status": "In Progress"
+  },
+  {
+    "name": "Part4",
+    "quantity": "2",
+    "assignee": ["Admin"],
+    "designer": "john@foo.com",
+    "mechanism": ["Review Mech"],
+    "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.pdf",
+    "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
+    "notes": "Needs to be plasma cut",
+    "status": "For Review"
+  },
+  {
+    "name": "Part3",
+    "quantity": "2",
+    "assignee": ["Admin"],
+    "designer": "john@foo.com",
+    "mechanism": ["Completed Mech"],
+    "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.pdf",
+    "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
+    "notes": "Needs to be plasma cut",
+    "status": "Done"
   }
 ]

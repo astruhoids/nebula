@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Roles } from 'meteor/alanning:roles';
 import { withTracker } from 'meteor/react-meteor-data';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress, Loader, Form } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress, Loader, Form, Dropdown } from 'semantic-ui-react';
 import _ from 'lodash';
 import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
@@ -60,11 +60,7 @@ class ProjectBoard extends React.Component {
     this.state = { value: '', loaded: false, todo: [], progress: [], review: [], done: [] };
   }
 
-  handleSearch = (e, { value }) => this.setState({ value })
-
-  updateSearch(e) {
-    this.setState({ search: e.target.value });
-  }
+  handleChange = (e, { value }) => this.setState({ value })
 
   /** Updating the issues from the Parts Collection */
   updateIssues() {
@@ -78,6 +74,7 @@ class ProjectBoard extends React.Component {
       return part.status === 'To Do';
     });
     // Will need to make variables for progress, review, and done
+
     // Update the states and mark that the issues have been loaded
     this.setState({ loaded: true, todo: partsToDo });
   }
@@ -170,34 +167,82 @@ class ProjectBoard extends React.Component {
       }
     };
 
-    const options = [
-      { key: 'assignee', text: 'Assignee', value: 'assignee' },
-      { key: 'mechanism', text: 'Mechanism', value: 'mechanism' },
-      { key: 'designer', text: 'Designer', value: 'designer' },
-    ];
+    // Variables for filters
+    const { value } = this.state;
+    let todoParts;
+    let progressParts;
+    let reviewParts;
+    let doneParts;
+
+    // Get filter options for mechanisms that are currently in the project
+    const mechOptions = _.uniqWith(this.props.parts.map(mech => ({
+      key: `${mech.mechanism}`,
+      text: `${mech.mechanism}`,
+      value: `${mech.mechanism}`,
+    })), _.isEqual);
+
+    // Get filter options for assignees that are currently in the project
+    const assigneeOptions = _.uniqWith(this.props.parts.map(assignee => ({
+      key: `${assignee.assignee}`,
+      text: `${assignee.assignee}`,
+      value: `${assignee.assignee}`,
+    })), _.isEqual);
+
+    // Filter results based on selected mechanism
+    if (this.state.value === '' || this.state.value.length === 0) {
+      todoParts = this.state.todo;
+      progressParts = this.state.progress;
+      reviewParts = this.state.review;
+      doneParts = this.state.done;
+    } else {
+      for (let i = 0; i < this.state.value.length; i++) {
+        if (mechOptions.some(e => e.key === this.state.value)) {
+          todoParts = this.state.todo.filter(part => part.mechanism.includes(this.state.value));
+          progressParts = this.state.progress.filter(part => part.mechanism.includes(this.state.value));
+          reviewParts = this.state.review.filter(part => part.mechanism.includes(this.state.value));
+          doneParts = this.state.done.filter(part => part.mechanism.includes(this.state.value));
+        } else if (assigneeOptions.some(e => e.key === this.state.value)) {
+          todoParts = this.state.todo.filter(part => part.assignee.includes(this.state.value));
+          progressParts = this.state.progress.filter(part => part.assignee.includes(this.state.value));
+          reviewParts = this.state.review.filter(part => part.assignee.includes(this.state.value));
+          doneParts = this.state.done.filter(part => part.assignee.includes(this.state.value));
+        }
+      }
+    }
 
     return (
       <Container fluid>
         <Header as='h1' textAlign='center' style={{ paddingTop: '15px', color: 'white' }}>Project</Header>
-        <Form size='large'>
-          <Form.Group widths='equal'>
-            <Form.Select
-              placeholder='Select Filter'
-              value={this.state.value}
-              onChange={this.handleSearch}
-              options={options}
-            />
-            <Form.Input
-              onChange={this.updateSearch.bind(this)}
-              name='search'
-              className='icon'
-              icon='search'
-              placeholder='Search Parts'
-            />
-          </Form.Group>
-        </Form>
         <DragDropContext onDragEnd={onDragEnd}>
           <Card.Group centered>
+            <Card>
+              <CardContent>
+                <Form>
+                  <Form.Group grouped>
+                    <label>Mechanism</label>
+                    {mechOptions.map(opt => (
+                      <Form.Checkbox
+                        key={opt.key}
+                        label={opt.text}
+                        value={opt.value}
+                        checked={value === opt.value}
+                        onChange={this.handleChange}
+                      />
+                    ))}
+                    <label>Assigned to...</label>
+                    {assigneeOptions.map(opt => (
+                      <Form.Checkbox
+                        key={opt.key}
+                        label={opt.text}
+                        value={opt.value}
+                        checked={value === opt.value}
+                        onChange={this.handleChange}
+                      />
+                    ))}
+                  </Form.Group>
+                </Form>
+              </CardContent>
+            </Card>
             <Card>
               <Card.Content>
                 <Card.Header>To Do</Card.Header>
@@ -210,7 +255,7 @@ class ProjectBoard extends React.Component {
                       style={{ height: '400px' }}
                     >
 
-                      {this.state.todo.map((part, index) => (
+                      {todoParts.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -249,7 +294,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {this.state.progress.map((part, index) => (
+                      {progressParts.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -288,7 +333,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {this.state.review.map((part, index) => (
+                      {reviewParts.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -327,7 +372,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {this.state.done.map((part, index) => (
+                      {doneParts.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
