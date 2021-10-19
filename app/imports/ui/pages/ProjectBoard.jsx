@@ -75,10 +75,9 @@ class ProjectBoard extends React.Component {
         part.key = part._id;
       }
 
-      return part.progress === 'To Do';
+      return part.status === 'To Do';
     });
     // Will need to make variables for progress, review, and done
-
     // Update the states and mark that the issues have been loaded
     this.setState({ loaded: true, todo: partsToDo });
   }
