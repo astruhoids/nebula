@@ -63,20 +63,42 @@ class ProjectBoard extends React.Component {
   handleChange = (e, { value }) => this.setState({ value })
 
   /** Updating the issues from the Parts Collection */
-  updateIssues() {
-    const partsToDo = this.props.parts.filter((part) => {
+  updateIssues() {    
+    let todoParts = [];
+    let progressParts = [];
+    let reviewParts = [];
+    let doneParts = [];
+
+    this.props.parts.forEach((part) => {
       if (part.key === undefined || part.key === null) {
         // Assigning the key to be the part's _id
         // eslint-disable-next-line no-param-reassign
         part.key = part._id;
       }
-
-      return part.status === 'To Do';
+      switch (part.status) {
+       case 'To Do':
+         todoParts.push(part);
+         break;
+       case 'In Progress':
+         progressParts.push(part);
+         break;
+       case 'For Review':
+         reviewParts.push(part);
+         break;
+       case 'Done':
+         doneParts.push(part);
+         break;
+      }
     });
-    // Will need to make variables for progress, review, and done
 
     // Update the states and mark that the issues have been loaded
-    this.setState({ loaded: true, todo: partsToDo });
+    this.setState({ 
+      loaded: true,
+      todo: todoParts,
+      progress: progressParts,
+      review: reviewParts,
+      done: doneParts,
+    });
   }
 
   /** Checking if the component successfully updated */
@@ -104,6 +126,7 @@ class ProjectBoard extends React.Component {
 
     const totalIssues = _.sum([this.state.todo.length, this.state.progress.length, this.state.done.length]);
 
+    // Converts droppableIds to valid status per the PartsCollection
     const toStatusValue = id => {
       switch (id) {
         case 'todo': return 'To Do';
@@ -131,16 +154,10 @@ class ProjectBoard extends React.Component {
         );
 
         // Setting the reordered list to be the new list
-        // By default it checks the todo column
-        let list = { items };
 
-        if (source.droppableId === 'progress') {
-          list = { progress: items };
-        } else if (source.droppableId === 'done') {
-          list = { done: items };
-        }
+        this.setState({ [source.droppableId]:items });
 
-        this.setState({ list });
+        console.log({[source.droppableId]: items});
 
         // Card is placed in a different column from origin
       } else {
