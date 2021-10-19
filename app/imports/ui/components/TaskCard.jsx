@@ -36,9 +36,18 @@ class TaskCard extends React.Component {
               <Grid.Column floated="left">
                 {(this.state.showBtn) ? (
                   <>
-                    <ViewInformation part={this.props.part} />
-                    {this.props.currentUser ?
-                      <Button as={NavLink} to={`edit/${this.props.part._id}`} size='mini' icon='edit' />
+                    <Grid.Row>
+                      <ViewInformation part={this.props.part} />
+                    </Grid.Row>
+                    {this.props.currentUser ? 
+                      (<Grid.Row
+                        style={{ marginTop: '0.4rem'}}>
+                        <Button
+                          as={NavLink}
+                          to={`edit/${this.props.part._id}`}
+                          size='mini' icon='edit' 
+                          />
+                      </Grid.Row>)
                       :
                       ''
                     }

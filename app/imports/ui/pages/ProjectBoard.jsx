@@ -5,7 +5,7 @@ import { Roles } from 'meteor/alanning:roles';
 import { withTracker } from 'meteor/react-meteor-data';
 import { withRouter, NavLink } from 'react-router-dom';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress, Loader, Form, Button } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress, Loader, Form, Button, Grid } from 'semantic-ui-react';
 import _ from 'lodash';
 import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
@@ -265,12 +265,28 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <Card.Content>
-                <Card.Header>To Do</Card.Header>
-                {this.props.currentUser ?
-                  <Button as={NavLink} to='add' size='mini' icon='plus' />
-                  :
-                  ''
-                }
+                <Card.Header>
+                  <Grid>
+                    <Grid.Row>
+                      <Grid.Column floated="left" width={11}>
+                        To Do
+                      </Grid.Column>
+                      <Grid.Column floated="left" >
+                        <Button 
+                          as={NavLink}
+                          style={{ margin: '0 0 0 0'}}
+                          to='add'
+                          size='mini'
+                          icon='plus' />
+                      </Grid.Column>
+                    </Grid.Row>
+                  </Grid>
+                </Card.Header>
+                {/* {this.props.currentUser ? */}
+                  {/* <Button as={NavLink} to='add' size='mini' icon='plus' /> */}
+                  {/* : */}
+                  {/* '' */}
+                {/* } */}
               </Card.Content>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId="todo">
@@ -310,7 +326,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
-                <Card.Header>In Progress</Card.Header>
+                <Card.Header style={{ marginBottom: '0.5rem' }}>In Progress</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId='progress'>
@@ -349,7 +365,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
-                <Card.Header>For Review</Card.Header>
+                <Card.Header style={{ marginBottom: '0.5rem' }}>For Review</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId='review'>
@@ -388,7 +404,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
-                <Card.Header>Done (Advisor Only)</Card.Header>
+                <Card.Header style={{ marginBottom: '0.5rem' }}>Done (Advisor Only)</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId='done' isDropDisabled={!this.props.currentUser}>
