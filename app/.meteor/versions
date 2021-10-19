@@ -51,6 +51,7 @@ mobile-status-bar@1.1.0
 modern-browsers@0.1.6
 modules@0.17.0
 modules-runtime@0.12.0
+momentjs:moment@2.29.1
 mongo@1.13.0
 mongo-decimal@0.1.2
 mongo-dev-server@1.1.0

@@ -2,7 +2,7 @@ import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 import { Tracker } from 'meteor/tracker';
 
-export const progressValues = ['To Do', 'In Progress', 'Done'];
+export const statusValues = ['To Do', 'In Progress', 'Done'];
 /**
  * The PartsCollection. It encapsulates state and variable values for stuff.
  */
@@ -16,23 +16,34 @@ class PartsCollection {
     this.schema = new SimpleSchema({
       name: String,
       quantity: Number,
-      assignee: String,
+      assignee: {
+        type: Array,
+        optional: true,
+      },
+      'assignee.$': String,
       designer: String,
-      mechanism: String,
+      mechanism: Array,
+      'mechanism.$': String,
       pdf: String,
       stl: String,
-      notes: String,
-      progress: {
+      notes: {
         type: String,
-        allowedValues: progressValues,
+        optional: true,
+      },
+      status: {
+        type: String,
+        allowedValues: statusValues,
         defaultValue: 'To Do',
+      },
+      year: {
+        type: Number,
+        defaultValue: moment().year(),
       },
     }, { tracker: Tracker });
     // Attach the schema to the collection, so all attempts to insert a document are checked against schema.
     this.collection.attachSchema(this.schema);
     // Define names for publications and subscriptions
-    this.userPublicationName = `${this.name}.publication.user`;
-    this.adminPublicationName = `${this.name}.publication.admin`;
+    this.publicationName = `${this.name}.publication`;
   }
 }
 
