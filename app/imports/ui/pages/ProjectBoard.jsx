@@ -5,7 +5,7 @@ import { Roles } from 'meteor/alanning:roles';
 import { withTracker } from 'meteor/react-meteor-data';
 import { withRouter, NavLink } from 'react-router-dom';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress, Loader, Form, Button, Grid } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress, Loader, Form, Button } from 'semantic-ui-react';
 import _ from 'lodash';
 import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
@@ -77,18 +77,18 @@ class ProjectBoard extends React.Component {
         part.key = part._id;
       }
       switch (part.status) {
-        case 'To Do':
-          todoParts.push(part);
-          break;
-        case 'In Progress':
-          progressParts.push(part);
-          break;
-        case 'For Review':
-          reviewParts.push(part);
-          break;
-        case 'Done':
-          doneParts.push(part);
-          break;
+      case 'To Do':
+        todoParts.push(part);
+        break;
+      case 'In Progress':
+        progressParts.push(part);
+        break;
+      case 'For Review':
+        reviewParts.push(part);
+        break;
+      case 'Done':
+        doneParts.push(part);
+        break;
         // no default
       }
     });
@@ -131,10 +131,10 @@ class ProjectBoard extends React.Component {
     // Converts droppableIds to valid status per the PartsCollection
     const toStatusValue = id => {
       switch (id) {
-        case 'todo': return 'To Do';
-        case 'progress': return 'In Progress';
-        case 'review': return 'For Review';
-        case 'done': return 'Done';
+      case 'todo': return 'To Do';
+      case 'progress': return 'In Progress';
+      case 'review': return 'For Review';
+      case 'done': return 'Done';
         // no default
       }
     };
@@ -266,7 +266,11 @@ class ProjectBoard extends React.Component {
             <Card>
               <Card.Content>
                 <Card.Header>To Do</Card.Header>
-                <Button as={NavLink} to='add' size='mini' icon='plus' />
+                {this.props.currentUser ?
+                  <Button as={NavLink} to='add' size='mini' icon='plus' />
+                  :
+                  ''
+                }
               </Card.Content>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId="todo">
