@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Button, Header, Grid, Icon } from 'semantic-ui-react';
+import { Modal, Button, Header, Grid, Icon, List, Accordion } from 'semantic-ui-react';
+import STLViewer from 'stl-viewer';
 
 const ViewInformation = ({ part }) => {
   const [open, setOpen] = React.useState(false);
+  const [stlView, setStlView] = React.useState(false);
 
   return (
     <Modal
@@ -11,7 +13,7 @@ const ViewInformation = ({ part }) => {
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
       open={open}
-      trigger={<Button size="mini" icon="info"/>}
+      trigger={<Button size="mini" icon="info" />}
     >
       <Modal.Header>{part.name} - Status: {part.progress}</Modal.Header>
       <Modal.Content>
@@ -30,8 +32,27 @@ const ViewInformation = ({ part }) => {
           <Grid.Column widht={12}>
             <Modal.Description>
               <Header>Files Attached:</Header>
-              <iframe src={part.pdf} width='100%'></iframe>
-              {part.stl}
+              <List>
+                <List.Item><Button href={part.pdf} target='_blank' rel='noreferrer'><Icon name='file pdf'/>Open PDF</Button></List.Item>
+                <List.Item>
+                  <Accordion>
+                    <Accordion.Title>
+                      <Button onClick={() => setStlView(!stlView)}><Icon name='eye'/>Preview STL</Button>
+                    </Accordion.Title>
+                    <Accordion.Content active={stlView}>
+                      <STLViewer
+                        model={part.stl}
+                        width={400}
+                        height={400}
+                        modelColor='#B92C2C'
+                        backgroundColor='#EAEAEA'
+                        rotate={true}
+                        orbitControls={true}
+                      />
+                    </Accordion.Content>
+                  </Accordion>
+                </List.Item>
+              </List>
             </Modal.Description>
           </Grid.Column>
         </Grid>
