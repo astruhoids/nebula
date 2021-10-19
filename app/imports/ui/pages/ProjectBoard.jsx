@@ -55,10 +55,40 @@ const move = (source, target, droppableSource, droppableTarget) => {
 };
 
 class ProjectBoard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { value: '', loaded: false, todo: [], progress: [], review: [], done: [] };
+  }
+
   handleSearch = (e, { value }) => this.setState({ value })
 
   updateSearch(e) {
     this.setState({ search: e.target.value });
+  }
+
+  /** Updating the issues from the Parts Collection */
+  updateIssues() {
+    const partsToDo = this.props.parts.filter((part) => {
+      if (part.key === undefined || part.key === null) {
+        // Assigning the key to be the part's _id
+        // eslint-disable-next-line no-param-reassign
+        part.key = part._id;
+      }
+
+      return part.progress === 'To Do';
+    });
+    // Will need to make variables for progress, review, and done
+
+    // Update the states and mark that the issues have been loaded
+    this.setState({ loaded: true, todo: partsToDo });
+  }
+
+  /** Checking if the component successfully updated */
+  componentDidUpdate() {
+    // If the issues weren't loaded as well as the props, we call UpdateIssues() to load them.
+    if (!this.state.loaded && this.props.parts && this.props.ready) {
+      this.updateIssues();
+    }
   }
 
   /** If the subscription(s) have been received, render the page, otherwise show a loading icon. */
@@ -67,16 +97,6 @@ class ProjectBoard extends React.Component {
   }
 
   renderPage() {
-    const state = {
-      value: '',
-      todo: [],
-      progress: [],
-      review: [],
-      done: [],
-    };
-
-    // const { value } = state;
-
     const idList = {
       todo: 'todo',
       progress: 'progress',
@@ -84,16 +104,13 @@ class ProjectBoard extends React.Component {
       done: 'done',
     };
     // Grabbing list based on the id
-    const getList = id => state[idList[id]];
+    const getList = id => this.state[idList[id]];
 
-    const totalIssues = _.sum([state.todo.length, state.progress.length, state.done.length]);
+    const totalIssues = _.sum([this.state.todo.length, this.state.progress.length, this.state.done.length]);
 
     // When user stops dragging (aka releases card)
     const onDragEnd = result => {
       const { source, destination } = result;
-
-      console.log(source);
-      console.log(destination);
 
       // Card dropped in an invalid location
       if (!destination) {
@@ -134,28 +151,13 @@ class ProjectBoard extends React.Component {
           destination,
         );
 
-        console.log(output);
-
         // Based on which columns were affected, update dynamically with the cards moved
         this.setState({
           [columnA]: output[columnA],
           [columnB]: output[columnB],
         });
-
-        console.log(output[columnA]);
-        console.log(output[columnB]);
       }
     };
-
-    const partsToDo = this.props.parts.filter((part) => {
-      if (part.key === undefined || part.key === null) {
-        // eslint-disable-next-line no-param-reassign
-        part.key = part._id;
-      }
-      return part.progress === 'To Do';
-    });
-
-    state.todo = partsToDo;
 
     const options = [
       { key: 'assignee', text: 'Assignee', value: 'assignee' },
@@ -170,7 +172,7 @@ class ProjectBoard extends React.Component {
           <Form.Group widths='equal'>
             <Form.Select
               placeholder='Select Filter'
-              value={state.value}
+              value={this.state.value}
               onChange={this.handleSearch}
               options={options}
             />
@@ -197,7 +199,7 @@ class ProjectBoard extends React.Component {
                       style={{ height: '400px' }}
                     >
 
-                      {state.todo.map((part, index) => (
+                      {this.state.todo.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -220,7 +222,7 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={((state.todo.length / totalIssues) * 100).toFixed(1)}
+                  percent={((this.state.todo.length / totalIssues) * 100).toFixed(1)}
                   progress error
                 />
               </Card.Content>
@@ -236,7 +238,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {state.progress.map((part, index) => (
+                      {this.state.progress.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -259,7 +261,7 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={((state.progress.length / totalIssues) * 100).toFixed(1)}
+                  percent={((this.state.progress.length / totalIssues) * 100).toFixed(1)}
                   progress warning
                 />
               </Card.Content>
@@ -275,7 +277,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {state.review.map((part, index) => (
+                      {this.state.review.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -298,7 +300,7 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={((state.review.length / totalIssues) * 100).toFixed(1)}
+                  percent={((this.state.review.length / totalIssues) * 100).toFixed(1)}
                   progress color={'olive'}
                 />
               </Card.Content>
@@ -314,7 +316,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {state.done.map((part, index) => (
+                      {this.state.done.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -339,7 +341,7 @@ class ProjectBoard extends React.Component {
               </Card.Content>
               <Card.Content>
                 <Progress className="no-margin"
-                  percent={((state.done.length / totalIssues) * 100).toFixed(1)}
+                  percent={((this.state.done.length / totalIssues) * 100).toFixed(1)}
                   progress success
                 />
               </Card.Content>
