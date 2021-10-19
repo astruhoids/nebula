@@ -2,23 +2,25 @@
   {
     "name": "2445 Camera Mount",
     "quantity": "4",
-    "assignee": "john@foo.com",
+    "assignee": ["John"],
     "designer": "admin@foo.com",
-    "mechanism": "Camera",
+    "mechanism": ["Camera"],
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.STL",
     "notes": "3D Printer has no filament atm",
-    "progress": "To Do"
+    "status": "To Do",
+    "year": "2021"
   },
   {
     "name": "Part2",
     "quantity": "2",
-    "assignee": "admin@foo.com",
+    "assignee": ["Admin"],
     "designer": "john@foo.com",
-    "mechanism": "Chassis",
+    "mechanism": ["Chassis"],
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
     "notes": "Needs to be plasma cut",
-    "progress": "In Progress"
+    "status": "In Progress",
+    "year": "2021"
   }
 ]
