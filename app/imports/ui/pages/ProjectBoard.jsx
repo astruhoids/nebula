@@ -362,7 +362,7 @@ ProjectBoard.propTypes = {
 export default withTracker(() => {
   // Check if the current user is in the admin role
   const currentUser = Roles.userIsInRole(Meteor.userId(), 'admin');
-  const subscription = Meteor.subscribe(Parts.userPublicationName);
+  const subscription = Meteor.subscribe(Parts.publicationName);
   const ready = subscription.ready();
   const parts = Parts.collection.find({}).fetch();
   return {
