@@ -3,8 +3,9 @@ import { Meteor } from 'meteor/meteor';
 import PropTypes from 'prop-types';
 import { Roles } from 'meteor/alanning:roles';
 import { withTracker } from 'meteor/react-meteor-data';
+import { withRouter, NavLink } from 'react-router-dom';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress, Loader, Form } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress, Loader, Form, Button } from 'semantic-ui-react';
 import _ from 'lodash';
 import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
@@ -75,20 +76,19 @@ class ProjectBoard extends React.Component {
         part.key = part._id;
       }
       switch (part.status) {
-      case 'To Do':
-        todoParts.push(part);
-        break;
-      case 'In Progress':
-        progressParts.push(part);
-        break;
-      case 'For Review':
-        reviewParts.push(part);
-        break;
-      case 'Done':
-        doneParts.push(part);
-        break;
-      default:
-          // none
+        case 'To Do':
+          todoParts.push(part);
+          break;
+        case 'In Progress':
+          progressParts.push(part);
+          break;
+        case 'For Review':
+          reviewParts.push(part);
+          break;
+        case 'Done':
+          doneParts.push(part);
+          break;
+        // no default
       }
     });
 
@@ -137,11 +137,11 @@ class ProjectBoard extends React.Component {
     // Converts droppableIds to valid status per the PartsCollection
     const toStatusValue = id => {
       switch (id) {
-      case 'todo': return 'To Do';
-      case 'progress': return 'In Progress';
-      case 'review': return 'For Review';
-      case 'done': return 'Done';
-      default: return 'To Do';
+        case 'todo': return 'To Do';
+        case 'progress': return 'In Progress';
+        case 'review': return 'For Review';
+        case 'done': return 'Done';
+        // no default
       }
     };
 
@@ -165,6 +165,8 @@ class ProjectBoard extends React.Component {
         // Setting the reordered list to be the new list
 
         this.setState({ [source.droppableId]: items });
+
+        console.log({ [source.droppableId]: items });
 
         // Card is placed in a different column from origin
       } else {
@@ -265,6 +267,7 @@ class ProjectBoard extends React.Component {
             <Card>
               <Card.Content>
                 <Card.Header>To Do</Card.Header>
+                <Button as={NavLink} to='add' size='mini' icon='plus' />
               </Card.Content>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId="todo">
@@ -423,7 +426,7 @@ class ProjectBoard extends React.Component {
             </Card>
           </Card.Group>
         </DragDropContext>
-      </Container>
+      </Container >
     );
   }
 }
@@ -434,7 +437,7 @@ ProjectBoard.propTypes = {
   ready: PropTypes.bool.isRequired,
 };
 
-export default withTracker(() => {
+const Project = withTracker(() => {
   // Check if the current user is in the admin role
   const currentUser = Roles.userIsInRole(Meteor.userId(), 'admin');
   const subscription = Meteor.subscribe(Parts.publicationName);
@@ -446,3 +449,5 @@ export default withTracker(() => {
     ready,
   };
 })(ProjectBoard);
+
+export default withRouter(Project);

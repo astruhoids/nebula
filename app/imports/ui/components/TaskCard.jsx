@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Grid } from 'semantic-ui-react';
+import { Card, Grid, Button } from 'semantic-ui-react';
+import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ViewInformation from '../components/ViewInformation';
 
@@ -30,7 +31,13 @@ class TaskCard extends React.Component {
                 </Card.Description>
               </Grid.Column>
               <Grid.Column floated="left">
-                {(this.state.showBtn) ? (<ViewInformation part={this.props.part} />) : <></>}
+                {(this.state.showBtn) ? (
+                  <>
+                    <ViewInformation part={this.props.part} />
+                    <Button as={NavLink} to={`edit/${this.props.part._id}`} size='mini' icon='edit' />
+                  </>
+                ) : <></>
+                }
               </Grid.Column>
             </Grid.Row>
           </Grid>
