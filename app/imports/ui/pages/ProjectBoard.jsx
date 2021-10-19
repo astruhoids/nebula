@@ -9,6 +9,7 @@ import { Card, CardContent, Container, Header, Progress, Loader, Form, Button } 
 import _ from 'lodash';
 import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
+import SearchFilters from '../components/SearchFilters';
 
 /**
  * Called when card is reorder within the same column.
@@ -58,10 +59,8 @@ const move = (source, target, droppableSource, droppableTarget) => {
 class ProjectBoard extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { value: '', loaded: false, todo: [], progress: [], review: [], done: [] };
+    this.state = { value: '', search: '', loaded: false, todo: [], progress: [], review: [], done: [] };
   }
-
-  handleChange = (e, { value }) => this.setState({ value })
 
   /** Updating the issues from the Parts Collection */
   updateIssues() {
@@ -93,13 +92,27 @@ class ProjectBoard extends React.Component {
       }
     });
 
+  // sorts by field index normally, except moves -1s (new entries) to the back/bottom of list
+    const sortIndex = (a, b) => {
+      if (a.index === -1 && b.index === -1) {
+        return 0;
+      }
+      if (a.index === -1) {
+        return 1;
+      }
+      if (b.index === -1) {
+        return -1;
+      }
+      return a.index - b.index;
+    }
+
     // Update the states and mark that the issues have been loaded
     this.setState({
       loaded: true,
-      todo: todoParts,
-      progress: progressParts,
-      review: reviewParts,
-      done: doneParts,
+      todo: todoParts.sort(sortIndex),
+      progress: progressParts.sort(sortIndex),
+      review: reviewParts.sort(sortIndex),
+      done: doneParts.sort(sortIndex),
     });
   }
 
@@ -111,9 +124,25 @@ class ProjectBoard extends React.Component {
     }
   }
 
+  /** Handle user selection/input for filters */
+  handleChange = (e, { value }) => this.setState({ value })
+
+  handleSearch = (e) => this.setState({ search: e.target.value })
+
+  handleSearchClear = () => this.setState({ search: '', value: '' })
+
   /** If the subscription(s) have been received, render the page, otherwise show a loading icon. */
   render() {
     return (this.props.ready && this.props.parts) ? this.renderPage() : <Loader active>Getting data</Loader>;
+  }
+
+  // Updates part indices when dragging and reordering cols
+  updateIndices(partArrays) {
+    partArrays.forEach((arr) => {
+      arr.map((part, i) => {
+        Parts.collection.update(part._id, { $set: { index: i } });
+      });
+    });
   }
 
   renderPage() {
@@ -158,9 +187,7 @@ class ProjectBoard extends React.Component {
 
         // Setting the reordered list to be the new list
 
-        this.setState({ [source.droppableId]: items });
-
-        console.log({ [source.droppableId]: items });
+        this.setState({ [source.droppableId]:items }, () => this.updateIndices([items]));
 
         // Card is placed in a different column from origin
       } else {
@@ -180,19 +207,19 @@ class ProjectBoard extends React.Component {
         this.setState({
           [columnA]: output[columnA],
           [columnB]: output[columnB],
-        });
+        }, () => this.updateIndices([output[columnA], output[columnB]]));
 
-        // Edit DB entry when switching
-        Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) } });
+        // Edit part status when switching columns
+        Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) }})
       }
     };
 
     // Variables for filters
     const { value } = this.state;
-    let todoParts;
-    let progressParts;
-    let reviewParts;
-    let doneParts;
+    let todoParts = this.state.todo;
+    let progressParts = this.state.progress;
+    let reviewParts = this.state.review;
+    let doneParts = this.state.done;
 
     // Get filter options for mechanisms that are currently in the project
     const mechOptions = _.uniqWith(this.props.parts.map(mech => ({
@@ -208,13 +235,8 @@ class ProjectBoard extends React.Component {
       value: `${assignee.assignee}`,
     })), _.isEqual);
 
-    // Filter results based on selected mechanism
-    if (this.state.value === '' || this.state.value.length === 0) {
-      todoParts = this.state.todo;
-      progressParts = this.state.progress;
-      reviewParts = this.state.review;
-      doneParts = this.state.done;
-    } else {
+    // Filter results based on selected mechanism or assignee
+    if (this.state.value !== '' || this.state.value.length !== 0) {
       for (let i = 0; i < this.state.value.length; i++) {
         if (mechOptions.some(e => e.key === this.state.value)) {
           todoParts = this.state.todo.filter(part => part.mechanism.includes(this.state.value));
@@ -230,39 +252,39 @@ class ProjectBoard extends React.Component {
       }
     }
 
+    // Filter results based on search text
+    todoParts = todoParts.filter(
+      (part) => part.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1,
+    );
+    reviewParts = reviewParts.filter(
+      (part) => part.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1,
+    );
+    progressParts = progressParts.filter(
+      (part) => part.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1,
+    );
+    doneParts = doneParts.filter(
+      (part) => part.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1,
+    );
+
     return (
       <Container fluid>
         <Header as='h1' textAlign='center' style={{ paddingTop: '15px', color: 'white' }}>Project</Header>
         <DragDropContext onDragEnd={onDragEnd}>
           <Card.Group centered>
-            <Card>
-              <CardContent>
-                <Form>
-                  <Form.Group grouped>
-                    <label>Mechanism</label>
-                    {mechOptions.map(opt => (
-                      <Form.Checkbox
-                        key={opt.key}
-                        label={opt.text}
-                        value={opt.value}
-                        checked={value === opt.value}
-                        onChange={this.handleChange}
-                      />
-                    ))}
-                    <label>Assigned to...</label>
-                    {assigneeOptions.map(opt => (
-                      <Form.Checkbox
-                        key={opt.key}
-                        label={opt.text}
-                        value={opt.value}
-                        checked={value === opt.value}
-                        onChange={this.handleChange}
-                      />
-                    ))}
-                  </Form.Group>
-                </Form>
-              </CardContent>
-            </Card>
+            <SearchFilters
+              onChange={this.handleSearch.bind(this)}
+              mechOptions={mechOptions}
+              callbackfn={opt => (
+                <Form.Checkbox
+                  key={opt.key}
+                  label={opt.text}
+                  value={opt.value}
+                  checked={value === opt.value}
+                  onChange={this.handleChange}
+                />
+              )}
+              assigneeOptions={assigneeOptions}
+              onClick={this.handleSearchClear}/>
             <Card>
               <Card.Content>
                 <Card.Header>To Do</Card.Header>
