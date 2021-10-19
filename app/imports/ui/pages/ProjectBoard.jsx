@@ -62,10 +62,6 @@ class ProjectBoard extends React.Component {
 
   handleChange = (e, { value }) => this.setState({ value })
 
-  updateSearch(e) {
-    this.setState({ search: e.target.value });
-  }
-
   /** Updating the issues from the Parts Collection */
   updateIssues() {
     const partsToDo = this.props.parts.filter((part) => {
@@ -78,17 +74,9 @@ class ProjectBoard extends React.Component {
       return part.status === 'To Do';
     });
     // Will need to make variables for progress, review, and done
-    const partsReview = this.props.parts.filter((part) => {
-      if (part.key === undefined || part.key === null) {
-        // Assigning the key to be the part's _id
-        // eslint-disable-next-line no-param-reassign
-        part.key = part._id;
-      }
 
-      return part.progress === 'Review';
-    });
     // Update the states and mark that the issues have been loaded
-    this.setState({ loaded: true, todo: partsToDo, review: partsReview });
+    this.setState({ loaded: true, todo: partsToDo });
   }
 
   /** Checking if the component successfully updated */
@@ -167,12 +155,12 @@ class ProjectBoard extends React.Component {
       }
     };
 
-    // Variables for filter
+    // Variables for filters
     const { value } = this.state;
-    let todoParts = this.state.todo;
-    let progressParts = this.state.progress;
-    let reviewParts = this.state.review;
-    let doneParts = this.state.done;
+    let todoParts;
+    let progressParts;
+    let reviewParts;
+    let doneParts;
 
     // Get filter options for mechanisms that are currently in the project
     const mechOptions = _.uniqWith(this.props.parts.map(mech => ({
@@ -181,42 +169,68 @@ class ProjectBoard extends React.Component {
       value: `${mech.mechanism}`,
     })), _.isEqual);
 
+    // Get filter options for assignees that are currently in the project
+    const assigneeOptions = _.uniqWith(this.props.parts.map(assignee => ({
+      key: `${assignee.assignee}`,
+      text: `${assignee.assignee}`,
+      value: `${assignee.assignee}`,
+    })), _.isEqual);
+
+    // Filter results based on selected mechanism
     if (this.state.value === '' || this.state.value.length === 0) {
       todoParts = this.state.todo;
       progressParts = this.state.progress;
       reviewParts = this.state.review;
       doneParts = this.state.done;
     } else {
-      let filteredTodo = [];
-      let filteredProgress = [];
-      let filteredReview = [];
-      let filteredDone = [];
       for (let i = 0; i < this.state.value.length; i++) {
-        // Filter the results to selected value
-        filteredTodo = this.state.todo.filter(part => part.mechanism.includes(this.state.value));
-        filteredProgress = this.state.progress.filter(part => part.mechanism.includes(this.state.value));
-        filteredReview = this.state.review.filter(part => part.mechanism.includes(this.state.value));
-        filteredDone = this.state.done.filter(part => part.mechanism.includes(this.state.value));
+        if (mechOptions.some(e => e.key === this.state.value)) {
+          todoParts = this.state.todo.filter(part => part.mechanism.includes(this.state.value));
+          progressParts = this.state.progress.filter(part => part.mechanism.includes(this.state.value));
+          reviewParts = this.state.review.filter(part => part.mechanism.includes(this.state.value));
+          doneParts = this.state.done.filter(part => part.mechanism.includes(this.state.value));
+        } else if (assigneeOptions.some(e => e.key === this.state.value)) {
+          todoParts = this.state.todo.filter(part => part.assignee.includes(this.state.value));
+          progressParts = this.state.progress.filter(part => part.assignee.includes(this.state.value));
+          reviewParts = this.state.review.filter(part => part.assignee.includes(this.state.value));
+          doneParts = this.state.done.filter(part => part.assignee.includes(this.state.value));
+        }
       }
-      todoParts = filteredTodo;
-      progressParts = filteredProgress;
-      reviewParts = filteredReview;
-      doneParts = filteredDone;
     }
 
     return (
       <Container fluid>
         <Header as='h1' textAlign='center' style={{ paddingTop: '15px', color: 'white' }}>Project</Header>
-        <Dropdown
-          placeholder='Mechanism'
-          value={value}
-          clearable
-          options={mechOptions}
-          selection
-          onChange={this.handleChange}
-        />
         <DragDropContext onDragEnd={onDragEnd}>
           <Card.Group centered>
+            <Card>
+              <CardContent>
+                <Form>
+                  <Form.Group grouped>
+                    <label>Mechanism</label>
+                    {mechOptions.map(opt => (
+                      <Form.Checkbox
+                        key={opt.key}
+                        label={opt.text}
+                        value={opt.value}
+                        checked={value === opt.value}
+                        onChange={this.handleChange}
+                      />
+                    ))}
+                    <label>Assigned to...</label>
+                    {assigneeOptions.map(opt => (
+                      <Form.Checkbox
+                        key={opt.key}
+                        label={opt.text}
+                        value={opt.value}
+                        checked={value === opt.value}
+                        onChange={this.handleChange}
+                      />
+                    ))}
+                  </Form.Group>
+                </Form>
+              </CardContent>
+            </Card>
             <Card>
               <Card.Content>
                 <Card.Header>To Do</Card.Header>
