@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Button, Header, Grid } from 'semantic-ui-react';
+import { Modal, Button, Header, Grid, Icon } from 'semantic-ui-react';
 
 const ViewInformation = ({ part }) => {
   const [open, setOpen] = React.useState(false);
@@ -11,7 +11,7 @@ const ViewInformation = ({ part }) => {
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
       open={open}
-      trigger={<Button>View Info.</Button>}
+      trigger={<Button size="mini" icon="info"/>}
     >
       <Modal.Header>{part.name} - Status: {part.progress}</Modal.Header>
       <Modal.Content>
