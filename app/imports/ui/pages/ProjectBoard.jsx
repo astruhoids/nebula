@@ -91,13 +91,27 @@ class ProjectBoard extends React.Component {
       }
     });
 
+  // sorts by field index normally, except moves -1s (new entries) to the back/bottom of list
+    const sortIndex = (a, b) => {
+      if (a.index === -1 && b.index === -1) {
+        return 0;
+      }
+      if (a.index === -1) {
+        return 1;
+      }
+      if (b.index === -1) {
+        return -1;
+      }
+      return a.index - b.index;
+    }
+
     // Update the states and mark that the issues have been loaded
     this.setState({ 
       loaded: true,
-      todo: todoParts,
-      progress: progressParts,
-      review: reviewParts,
-      done: doneParts,
+      todo: todoParts.sort(sortIndex),
+      progress: progressParts.sort(sortIndex),
+      review: reviewParts.sort(sortIndex),
+      done: doneParts.sort(sortIndex),
     });
   }
 
@@ -112,6 +126,21 @@ class ProjectBoard extends React.Component {
   /** If the subscription(s) have been received, render the page, otherwise show a loading icon. */
   render() {
     return (this.props.ready && this.props.parts) ? this.renderPage() : <Loader active>Getting data</Loader>;
+  }
+
+  // Updates part indices when dragging and reordering cols
+  updateIndices(partArrays) {
+    // TODO implement this const
+    const filterActive = false;
+    if (filterActive) {
+      // If filter is active, ignore reordering within col
+    } else {
+      partArrays.forEach((arr) => {
+        arr.map((part, i) => {
+          Parts.collection.update(part._id, { $set: { index: i } });
+        });
+      });
+    }
   }
 
   renderPage() {
@@ -155,9 +184,7 @@ class ProjectBoard extends React.Component {
 
         // Setting the reordered list to be the new list
 
-        this.setState({ [source.droppableId]:items });
-
-        console.log({[source.droppableId]: items});
+        this.setState({ [source.droppableId]:items }, () => this.updateIndices([items]));
 
         // Card is placed in a different column from origin
       } else {
@@ -177,9 +204,9 @@ class ProjectBoard extends React.Component {
         this.setState({
           [columnA]: output[columnA],
           [columnB]: output[columnB],
-        });
+        }, () => this.updateIndices([output[columnA], output[columnB]]));
 
-        // Edit DB entry when switching
+        // Edit part status when switching columns
         Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) }})
       }
     };

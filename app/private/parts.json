@@ -9,7 +9,8 @@
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.STL",
     "notes": "3D Printer has no filament atm",
     "status": "To Do",
-    "year": "2021"
+    "year": "2021",
+    "index": "-1"
   },
   {
     "name": "Another ToDo",
@@ -20,7 +21,8 @@
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.STL",
     "notes": "3D Printer has no filament atm",
-    "progress": "To Do"
+    "progress": "To Do",
+    "index": "-1"
   },
   {
     "name": "Part2",
@@ -31,7 +33,8 @@
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
     "notes": "Needs to be plasma cut",
-    "status": "In Progress"
+    "status": "In Progress",
+    "index": "-1"
   },
   {
     "name": "Part4",
@@ -42,7 +45,8 @@
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
     "notes": "Needs to be plasma cut",
-    "status": "For Review"
+    "status": "For Review",
+    "index": "-1"
   },
   {
     "name": "Part3",
@@ -53,6 +57,7 @@
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
     "notes": "Needs to be plasma cut",
-    "status": "Done"
+    "status": "Done",
+    "index": "-1"
   }
 ]
