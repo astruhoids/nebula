@@ -4,10 +4,11 @@ import PropTypes from 'prop-types';
 import { Roles } from 'meteor/alanning:roles';
 import { withTracker } from 'meteor/react-meteor-data';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress, Loader, Form, Dropdown } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress, Loader, Form } from 'semantic-ui-react';
 import _ from 'lodash';
 import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
+import SearchFilters from '../components/SearchFilters';
 
 /**
  * Called when card is reorder within the same column.
@@ -57,17 +58,15 @@ const move = (source, target, droppableSource, droppableTarget) => {
 class ProjectBoard extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { value: '', loaded: false, todo: [], progress: [], review: [], done: [] };
+    this.state = { value: '', search: '', loaded: false, todo: [], progress: [], review: [], done: [] };
   }
 
-  handleChange = (e, { value }) => this.setState({ value })
-
   /** Updating the issues from the Parts Collection */
-  updateIssues() {    
-    let todoParts = [];
-    let progressParts = [];
-    let reviewParts = [];
-    let doneParts = [];
+  updateIssues() {
+    const todoParts = [];
+    const progressParts = [];
+    const reviewParts = [];
+    const doneParts = [];
 
     this.props.parts.forEach((part) => {
       if (part.key === undefined || part.key === null) {
@@ -76,23 +75,25 @@ class ProjectBoard extends React.Component {
         part.key = part._id;
       }
       switch (part.status) {
-       case 'To Do':
-         todoParts.push(part);
-         break;
-       case 'In Progress':
-         progressParts.push(part);
-         break;
-       case 'For Review':
-         reviewParts.push(part);
-         break;
-       case 'Done':
-         doneParts.push(part);
-         break;
+      case 'To Do':
+        todoParts.push(part);
+        break;
+      case 'In Progress':
+        progressParts.push(part);
+        break;
+      case 'For Review':
+        reviewParts.push(part);
+        break;
+      case 'Done':
+        doneParts.push(part);
+        break;
+      default:
+          // none
       }
     });
 
     // Update the states and mark that the issues have been loaded
-    this.setState({ 
+    this.setState({
       loaded: true,
       todo: todoParts,
       progress: progressParts,
@@ -108,6 +109,13 @@ class ProjectBoard extends React.Component {
       this.updateIssues();
     }
   }
+
+  /** Handle user selection/input for filters */
+  handleChange = (e, { value }) => this.setState({ value })
+
+  handleSearch = (e) => this.setState({ search: e.target.value })
+
+  handleSearchClear = () => this.setState({ search: '', value: '' })
 
   /** If the subscription(s) have been received, render the page, otherwise show a loading icon. */
   render() {
@@ -129,10 +137,11 @@ class ProjectBoard extends React.Component {
     // Converts droppableIds to valid status per the PartsCollection
     const toStatusValue = id => {
       switch (id) {
-        case 'todo': return 'To Do';
-        case 'progress': return 'In Progress';
-        case 'review': return 'For Review';
-        case 'done': return 'Done';
+      case 'todo': return 'To Do';
+      case 'progress': return 'In Progress';
+      case 'review': return 'For Review';
+      case 'done': return 'Done';
+      default: return 'To Do';
       }
     };
 
@@ -155,9 +164,7 @@ class ProjectBoard extends React.Component {
 
         // Setting the reordered list to be the new list
 
-        this.setState({ [source.droppableId]:items });
-
-        console.log({[source.droppableId]: items});
+        this.setState({ [source.droppableId]: items });
 
         // Card is placed in a different column from origin
       } else {
@@ -180,16 +187,16 @@ class ProjectBoard extends React.Component {
         });
 
         // Edit DB entry when switching
-        Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) }})
+        Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) } });
       }
     };
 
     // Variables for filters
     const { value } = this.state;
-    let todoParts;
-    let progressParts;
-    let reviewParts;
-    let doneParts;
+    let todoParts = this.state.todo;
+    let progressParts = this.state.progress;
+    let reviewParts = this.state.review;
+    let doneParts = this.state.done;
 
     // Get filter options for mechanisms that are currently in the project
     const mechOptions = _.uniqWith(this.props.parts.map(mech => ({
@@ -205,13 +212,8 @@ class ProjectBoard extends React.Component {
       value: `${assignee.assignee}`,
     })), _.isEqual);
 
-    // Filter results based on selected mechanism
-    if (this.state.value === '' || this.state.value.length === 0) {
-      todoParts = this.state.todo;
-      progressParts = this.state.progress;
-      reviewParts = this.state.review;
-      doneParts = this.state.done;
-    } else {
+    // Filter results based on selected mechanism or assignee
+    if (this.state.value !== '' || this.state.value.length !== 0) {
       for (let i = 0; i < this.state.value.length; i++) {
         if (mechOptions.some(e => e.key === this.state.value)) {
           todoParts = this.state.todo.filter(part => part.mechanism.includes(this.state.value));
@@ -227,39 +229,39 @@ class ProjectBoard extends React.Component {
       }
     }
 
+    // Filter results based on search text
+    todoParts = todoParts.filter(
+      (part) => part.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1,
+    );
+    reviewParts = reviewParts.filter(
+      (part) => part.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1,
+    );
+    progressParts = progressParts.filter(
+      (part) => part.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1,
+    );
+    doneParts = doneParts.filter(
+      (part) => part.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1,
+    );
+
     return (
       <Container fluid>
         <Header as='h1' textAlign='center' style={{ paddingTop: '15px', color: 'white' }}>Project</Header>
         <DragDropContext onDragEnd={onDragEnd}>
           <Card.Group centered>
-            <Card>
-              <CardContent>
-                <Form>
-                  <Form.Group grouped>
-                    <label>Mechanism</label>
-                    {mechOptions.map(opt => (
-                      <Form.Checkbox
-                        key={opt.key}
-                        label={opt.text}
-                        value={opt.value}
-                        checked={value === opt.value}
-                        onChange={this.handleChange}
-                      />
-                    ))}
-                    <label>Assigned to...</label>
-                    {assigneeOptions.map(opt => (
-                      <Form.Checkbox
-                        key={opt.key}
-                        label={opt.text}
-                        value={opt.value}
-                        checked={value === opt.value}
-                        onChange={this.handleChange}
-                      />
-                    ))}
-                  </Form.Group>
-                </Form>
-              </CardContent>
-            </Card>
+            <SearchFilters
+              onChange={this.handleSearch.bind(this)}
+              mechOptions={mechOptions}
+              callbackfn={opt => (
+                <Form.Checkbox
+                  key={opt.key}
+                  label={opt.text}
+                  value={opt.value}
+                  checked={value === opt.value}
+                  onChange={this.handleChange}
+                />
+              )}
+              assigneeOptions={assigneeOptions}
+              onClick={this.handleSearchClear}/>
             <Card>
               <Card.Content>
                 <Card.Header>To Do</Card.Header>
