@@ -107,9 +107,18 @@ class ProjectBoard extends React.Component {
 
     const totalIssues = _.sum([this.state.todo.length, this.state.progress.length, this.state.done.length]);
 
+    const toStatusValue = id => {
+      switch (id) {
+        case 'todo': return 'To Do';
+        case 'progress': return 'In Progress';
+        case 'review': return 'For Review';
+        case 'done': return 'Done';
+      }
+    };
+
     // When user stops dragging (aka releases card)
     const onDragEnd = result => {
-      const { source, destination } = result;
+      const { source, destination, draggableId } = result;
 
       // Card dropped in an invalid location
       if (!destination) {
@@ -155,6 +164,9 @@ class ProjectBoard extends React.Component {
           [columnA]: output[columnA],
           [columnB]: output[columnB],
         });
+
+        // Edit DB entry when switching
+        Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) }})
       }
     };
 
