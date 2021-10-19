@@ -5,6 +5,7 @@ import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import { Redirect } from 'react-router';
 import { Parts, statusValues } from '../../api/parts/Parts';
 
 /** Renders the Page for editing a single document. */
@@ -23,16 +24,24 @@ class EditPart extends React.Component {
       notes: '',
       status: '',
       loading: true,
+      redirectToReferrer: false,
     };
+
+    this.submit = this.submit.bind(this);
   }
 
   // On successful submit, insert the data.
   submit() {
     const { name, quantity, assignee, mechanism, notes, designer, status, pdf, stl } = this.state;
     const { _id } = this.props.part;
-    Parts.collection.update(_id, { $set: { name, quantity, assignee, mechanism, notes, designer, status, pdf, stl } }, (error) => (error ?
-      swal('Error', error.message, 'error') :
-      swal('Success', 'Item updated successfully', 'success')));
+    Parts.collection.update(_id, { $set: { name, quantity, assignee, mechanism, notes, designer, status, pdf, stl } }, (error) => {
+      if (error) {
+        swal('Error', error.message, 'error');
+      } else {
+        swal('Success', 'Item updated successfully', 'success');
+        this.setState({ redirectToReferrer: true });
+      }
+    });
     console.log(assignee, mechanism);
   }
 
@@ -59,6 +68,10 @@ class EditPart extends React.Component {
 
   // If the subscription(s) have been received, render the page, otherwise show a loading icon.
   render() {
+    if (this.state.redirectToReferrer) {
+      return <Redirect to='/board' />;
+    }
+
     return (this.props.ready) ? this.renderPage() : <Loader active>Getting data</Loader>;
   }
 
@@ -69,7 +82,7 @@ class EditPart extends React.Component {
     return (
       <Grid container centered>
         <Grid.Column>
-          <Header as="h2" textAlign="center">Edit Stuff</Header>
+          <Header as="h2" textAlign="center" style={{ paddingTop: '15px', color: 'white' }}>Edit Stuff</Header>
           <Segment>
             <Form onSubmit={() => this.submit()}>
               <Form.Input name='name'
@@ -81,7 +94,7 @@ class EditPart extends React.Component {
                 label='Quantity'
                 placeholder='1'
                 value={quantity}
-                onChange={(e) => this.setState({ quantity: e.target.value })}/>
+                onChange={(e) => this.setState({ quantity: e.target.value })} />
               <Form.Dropdown name='designer'
                 label='Designer'
                 options={designers || []}
@@ -91,7 +104,7 @@ class EditPart extends React.Component {
                 placeholder='John Smith'
                 value={designer}
                 onAddItem={(e, { value }) => this.setState({ designers: designers.concat([{ key: `designer_${designers.length}`, text: value, value: value }]) })}
-                onChange={(e, { value }) => this.setState({ designer: value })}/>
+                onChange={(e, { value }) => this.setState({ designer: value })} />
               <Form.Dropdown name='assignee'
                 label='Assignee'
                 options={assignees || []}
@@ -102,7 +115,7 @@ class EditPart extends React.Component {
                 placeholder='John Smith'
                 value={assignee}
                 onAddItem={(e, { value }) => this.setState({ assignees: assignees.concat([{ key: `assignee_${assignees.length}`, text: value, value: value }]) })}
-                onChange={(e, { value }) => this.setState({ assignee: value })}/>
+                onChange={(e, { value }) => this.setState({ assignee: value })} />
               <Form.Dropdown name='mechanism'
                 label='Mechanism'
                 options={mechanisms || []}
@@ -113,12 +126,12 @@ class EditPart extends React.Component {
                 placeholder='Arm'
                 value={mechanism}
                 onAddItem={(e, { value }) => this.setState({ mechanisms: mechanisms.concat([{ key: `mechanism_${mechanisms.length}`, text: value, value: value }]) })}
-                onChange={(e, { value }) => this.setState({ mechanism: value })}/>
+                onChange={(e, { value }) => this.setState({ mechanism: value })} />
               <Form.TextArea name='notes'
                 label='Notes'
                 placeholder='Additional notes here...'
                 value={notes}
-                onChange={(e) => this.setState({ notes: e.target.value })}/>
+                onChange={(e) => this.setState({ notes: e.target.value })} />
               <Form.Button content='Submit' type='submit' />
             </Form>
           </Segment>

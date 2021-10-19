@@ -1,10 +1,11 @@
 import React from 'react';
-import { Grid, Segment, Header, Form, Loader, Image } from 'semantic-ui-react';
+import { Grid, Segment, Header, Form, Loader } from 'semantic-ui-react';
 import swal from 'sweetalert';
 import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { Redirect } from 'react-router';
 import { Parts, statusValues } from '../../api/parts/Parts';
 
 /** Renders the Page for adding a document. */
@@ -24,6 +25,8 @@ class AddPart extends React.Component {
       status: statusValues[0],
       loading: false,
     };
+
+    this.submit = this.submit.bind(this);
   }
 
   clear() {
@@ -51,6 +54,7 @@ class AddPart extends React.Component {
           swal('Error', error.message, 'error').then(() => this.clear());
         } else {
           swal('Success', `${name} added successfully`, 'success').then(() => this.clear());
+          this.setState({ redirectToReferrer: true });
         }
       });
   }
@@ -66,6 +70,10 @@ class AddPart extends React.Component {
   }
 
   render() {
+    if (this.state.redirectToReferrer) {
+      return <Redirect to='/board' />;
+    }
+
     return (this.props.ready) ? this.renderPage() : <Loader active>Getting data...</Loader>;
   }
 
@@ -73,7 +81,7 @@ class AddPart extends React.Component {
     const { name, quantity, assignee, mechanism, notes, loading, mechanisms, assignees, designer, designers } = this.state;
     return <Grid container centered>
       <Grid.Column>
-        <Header as="h2" textAlign="center">Add Part</Header>
+        <Header as="h2" textAlign="center" style={{ paddingTop: '15px', color: 'white' }}>Add Part</Header>
         <Segment>
           <Form loading={loading} onSubmit={() => this.submit()}>
             <Form.Input name='name'
