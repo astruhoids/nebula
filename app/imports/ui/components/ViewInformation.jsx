@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Button, Header, Grid, Icon, List, Accordion } from 'semantic-ui-react';
-import STLViewer from 'stl-viewer';
+import { STLViewer } from 'react-stl-obj-viewer';
 
 const ViewInformation = ({ part }) => {
   const [open, setOpen] = React.useState(false);
@@ -41,13 +41,11 @@ const ViewInformation = ({ part }) => {
                     </Accordion.Title>
                     <Accordion.Content active={stlView}>
                       <STLViewer
-                        model={part.stl}
+                        url={part.stl}
                         width={400}
                         height={400}
-                        modelColor='#B92C2C'
+                        modelColor='#00acb1'
                         backgroundColor='#EAEAEA'
-                        rotate={true}
-                        orbitControls={true}
                       />
                     </Accordion.Content>
                   </Accordion>
