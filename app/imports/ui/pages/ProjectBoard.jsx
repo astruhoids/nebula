@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Roles } from 'meteor/alanning:roles';
 import { withTracker } from 'meteor/react-meteor-data';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress, Loader, Form } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress, Loader, Form, Dropdown } from 'semantic-ui-react';
 import _ from 'lodash';
 import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
@@ -60,7 +60,7 @@ class ProjectBoard extends React.Component {
     this.state = { value: '', loaded: false, todo: [], progress: [], review: [], done: [] };
   }
 
-  handleSearch = (e, { value }) => this.setState({ value })
+  handleChange = (e, { value }) => this.setState({ value })
 
   updateSearch(e) {
     this.setState({ search: e.target.value });
@@ -78,8 +78,17 @@ class ProjectBoard extends React.Component {
       return part.status === 'To Do';
     });
     // Will need to make variables for progress, review, and done
+    const partsReview = this.props.parts.filter((part) => {
+      if (part.key === undefined || part.key === null) {
+        // Assigning the key to be the part's _id
+        // eslint-disable-next-line no-param-reassign
+        part.key = part._id;
+      }
+
+      return part.progress === 'Review';
+    });
     // Update the states and mark that the issues have been loaded
-    this.setState({ loaded: true, todo: partsToDo });
+    this.setState({ loaded: true, todo: partsToDo, review: partsReview });
   }
 
   /** Checking if the component successfully updated */
@@ -158,32 +167,54 @@ class ProjectBoard extends React.Component {
       }
     };
 
-    const options = [
-      { key: 'assignee', text: 'Assignee', value: 'assignee' },
-      { key: 'mechanism', text: 'Mechanism', value: 'mechanism' },
-      { key: 'designer', text: 'Designer', value: 'designer' },
-    ];
+    // Variables for filter
+    const { value } = this.state;
+    let todoParts = this.state.todo;
+    let progressParts = this.state.progress;
+    let reviewParts = this.state.review;
+    let doneParts = this.state.done;
+
+    // Get filter options for mechanisms that are currently in the project
+    const mechOptions = _.uniqWith(this.props.parts.map(mech => ({
+      key: `${mech.mechanism}`,
+      text: `${mech.mechanism}`,
+      value: `${mech.mechanism}`,
+    })), _.isEqual);
+
+    if (this.state.value === '' || this.state.value.length === 0) {
+      todoParts = this.state.todo;
+      progressParts = this.state.progress;
+      reviewParts = this.state.review;
+      doneParts = this.state.done;
+    } else {
+      let filteredTodo = [];
+      let filteredProgress = [];
+      let filteredReview = [];
+      let filteredDone = [];
+      for (let i = 0; i < this.state.value.length; i++) {
+        // Filter the results to selected value
+        filteredTodo = this.state.todo.filter(part => part.mechanism.includes(this.state.value));
+        filteredProgress = this.state.progress.filter(part => part.mechanism.includes(this.state.value));
+        filteredReview = this.state.review.filter(part => part.mechanism.includes(this.state.value));
+        filteredDone = this.state.done.filter(part => part.mechanism.includes(this.state.value));
+      }
+      todoParts = filteredTodo;
+      progressParts = filteredProgress;
+      reviewParts = filteredReview;
+      doneParts = filteredDone;
+    }
 
     return (
       <Container fluid>
         <Header as='h1' textAlign='center' style={{ paddingTop: '15px', color: 'white' }}>Project</Header>
-        <Form size='large'>
-          <Form.Group widths='equal'>
-            <Form.Select
-              placeholder='Select Filter'
-              value={this.state.value}
-              onChange={this.handleSearch}
-              options={options}
-            />
-            <Form.Input
-              onChange={this.updateSearch.bind(this)}
-              name='search'
-              className='icon'
-              icon='search'
-              placeholder='Search Parts'
-            />
-          </Form.Group>
-        </Form>
+        <Dropdown
+          placeholder='Mechanism'
+          value={value}
+          clearable
+          options={mechOptions}
+          selection
+          onChange={this.handleChange}
+        />
         <DragDropContext onDragEnd={onDragEnd}>
           <Card.Group centered>
             <Card>
@@ -198,7 +229,7 @@ class ProjectBoard extends React.Component {
                       style={{ height: '400px' }}
                     >
 
-                      {this.state.todo.map((part, index) => (
+                      {todoParts.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -237,7 +268,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {this.state.progress.map((part, index) => (
+                      {progressParts.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -276,7 +307,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {this.state.review.map((part, index) => (
+                      {reviewParts.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
@@ -315,7 +346,7 @@ class ProjectBoard extends React.Component {
                       ref={provided.innerRef}
                       style={{ height: '400px' }}
                     >
-                      {this.state.done.map((part, index) => (
+                      {doneParts.map((part, index) => (
                         <Draggable
                           key={part._id}
                           draggableId={part._id}
