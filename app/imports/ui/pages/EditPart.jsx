@@ -1,12 +1,14 @@
 import React from 'react';
-import { Grid, Loader, Header, Segment, Form } from 'semantic-ui-react';
+import { Grid, Loader, Header, Segment, Form, Container } from 'semantic-ui-react';
 import swal from 'sweetalert';
 import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { Redirect } from 'react-router';
-import { Parts, statusValues } from '../../api/parts/Parts';
+import { STLViewer } from 'react-stl-obj-viewer';
+import { Parts } from '../../api/parts/Parts';
+import { config, S3 } from 'aws-sdk';
 
 /** Renders the Page for editing a single document. */
 class EditPart extends React.Component {
@@ -31,18 +33,68 @@ class EditPart extends React.Component {
   }
 
   // On successful submit, insert the data.
-  submit() {
-    const { name, quantity, assignee, mechanism, notes, designer, status, pdf, stl } = this.state;
+  async submit() {
+    const { name, quantity, assignee, mechanism, notes, designer, status, stl, pdf, stlFile } = this.state;
     const { _id } = this.props.part;
-    Parts.collection.update(_id, { $set: { name, quantity, assignee, mechanism, notes, designer, status, pdf, stl } }, (error) => {
-      if (error) {
-        swal('Error', error.message, 'error');
-      } else {
-        swal('Success', 'Item updated successfully', 'success');
-        this.setState({ redirectToReferrer: true });
-      }
+    this.setState({ loading: true });
+    if (stlFile) {
+      const uploads = await this.uploadFiles(this.state.files);
+      Promise.all(uploads).then((files) => {
+        const newPdf = files.find(file => file.key.split('.').pop().toLowerCase() === 'pdf').Location;
+        const newStl = files.find(file => file.key.split('.').pop().toLowerCase() === 'stl').Location;
+        Parts.collection.update(_id, { $set: { name, quantity, assignee, mechanism, notes, designer, status, pdf: newPdf, stl: newStl } },
+          (error) => {
+            if (error) {
+              swal('Error', error.message, 'error').then(() => this.clear());
+            } else {
+              swal('Success', 'Item updated successfully', 'success');
+              this.setState({ redirectToReferrer: true });
+            }
+          });
+      });
+    } else {
+      Parts.collection.update(_id, { $set: { name, quantity, assignee, mechanism, notes, designer, status, pdf, stl } }, (error) => {
+        if (error) {
+          swal('Error', error.message, 'error');
+        } else {
+          swal('Success', 'Item updated successfully', 'success');
+          this.setState({ redirectToReferrer: true });
+        }
+      });
+    }
+  }
+
+  async uploadFiles(files) {
+    const promises = [];
+    config.update({ region: 'us-west-1' });
+    const s3 = new S3({
+      accessKeyId: Meteor.settings.public.s3.accessKeyId,
+      secretAccessKey: Meteor.settings.public.s3.secretAccessKey,
+      apiVersion: '2006-03-01',
     });
-    console.log(assignee, mechanism);
+    let upload;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const type = file.name.split('.').pop();
+      const params = {
+        Bucket: 'astruhoidsnebula',
+        Key: `${this.state.name.replaceAll('\\g', '_')}.${type}`, // File name you want to save as in S3
+        Body: file,
+      };
+
+      upload = await s3.upload(params, function (err) {
+        if (err) {
+          throw err;
+        }
+      });
+
+      promises.push(upload.promise());
+
+      upload.on('httpUploadProgress', (progress) => {
+        this.setState({ loadingProgress: (Math.round((progress.loaded / progress.total) * 100)), loaded: i });
+      });
+    }
+    return promises;
   }
 
   componentDidUpdate() {
@@ -63,6 +115,17 @@ class EditPart extends React.Component {
         assignees: _.flatten(_.uniq(this.props.parts.map(p => p.assignee))).map((assign, index) => ({ key: `assignee_${index}`, text: assign, value: assign })),
         designers: _.uniq(this.props.parts.map(p => p.designer)).map((assign, index) => ({ key: `designer_${index}`, text: assign, value: assign })),
       });
+    }
+  }
+
+  loadModel(e) {
+    const files = e.target.files;
+    this.setState({ files });
+    for (let i = 0; i < files.length; i++) {
+      const type = files[i].name.split('.').pop();
+      if (type.toLowerCase() === 'stl') {
+        this.setState({ stlFile: files[i] });
+      }
     }
   }
 
@@ -132,6 +195,36 @@ class EditPart extends React.Component {
                 placeholder='Additional notes here...'
                 value={notes}
                 onChange={(e) => this.setState({ notes: e.target.value })} />
+
+              <Form.Input
+                type='file'
+                multiple
+                label='Add STL and Schematic PDF'
+                accept='.pdf,.stl'
+                onChange={e => this.loadModel(e)}
+              />
+              <Container style={{ marginTop: '2rem' }}>
+                <Grid centered>
+                  { this.state.stlFile ?
+                    <STLViewer
+                      file={this.state.stlFile}
+                      width={800}
+                      height={500}
+                      modelColor='#00acb1'
+                      backgroundColor='#EAEAEA'
+                    />
+                    : ''}
+                  { !this.state.stlFile && this.state.stl ?
+                    <STLViewer
+                      url={this.state.stl}
+                      width={800}
+                      height={500}
+                      modelColor='#00acb1'
+                      backgroundColor='#EAEAEA'
+                    /> : ''}
+                </Grid>
+              </Container>
+
               <Form.Button content='Submit' type='submit' />
             </Form>
           </Segment>
