@@ -2,7 +2,7 @@ import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 import { Tracker } from 'meteor/tracker';
 
-export const statusValues = ['To Do', 'In Progress', 'Done'];
+export const statusValues = ['To Do', 'In Progress', 'For Review', 'Done'];
 /**
  * The PartsCollection. It encapsulates state and variable values for stuff.
  */
