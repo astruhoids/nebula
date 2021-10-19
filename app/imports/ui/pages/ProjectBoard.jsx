@@ -138,17 +138,11 @@ class ProjectBoard extends React.Component {
 
   // Updates part indices when dragging and reordering cols
   updateIndices(partArrays) {
-    // TODO implement this const
-    const filterActive = false;
-    if (filterActive) {
-      // If filter is active, ignore reordering within col
-    } else {
-      partArrays.forEach((arr) => {
-        arr.map((part, i) => {
-          Parts.collection.update(part._id, { $set: { index: i } });
-        });
+    partArrays.forEach((arr) => {
+      arr.map((part, i) => {
+        Parts.collection.update(part._id, { $set: { index: i } });
       });
-    }
+    });
   }
 
   renderPage() {
