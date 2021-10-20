@@ -16,6 +16,7 @@ class SearchFilters extends React.Component {
                 className="icon"
                 icon="search"
                 placeholder="Search Parts"
+                value={this.props.searchValue}
               />
               <label>Mechanism</label>
               {this.props.mechOptions.map(this.props.callbackfn)}
@@ -46,6 +47,7 @@ SearchFilters.propTypes = {
   callbackfn: PropTypes.func,
   assigneeOptions: PropTypes.arrayOf(PropTypes.any),
   onClick: PropTypes.func,
+  searchValue: PropTypes.string,
 };
 
 export default SearchFilters;
