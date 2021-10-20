@@ -285,7 +285,8 @@ class ProjectBoard extends React.Component {
                 />
               )}
               assigneeOptions={assigneeOptions}
-              onClick={this.handleSearchClear}/>
+              onClick={this.handleSearchClear}
+              searchValue={this.state.search}/>
             <Card>
               <Card.Content>
                 <Card.Header>
