@@ -1,6 +1,9 @@
 import React from 'react';
 import { Card, Grid, Button } from 'semantic-ui-react';
 import { NavLink } from 'react-router-dom';
+import { Roles } from 'meteor/alanning:roles';
+import { Meteor } from 'meteor/meteor';
+import { withTracker } from 'meteor/react-meteor-data';
 import PropTypes from 'prop-types';
 import ViewInformation from '../components/ViewInformation';
 
@@ -33,8 +36,21 @@ class TaskCard extends React.Component {
               <Grid.Column floated="left">
                 {(this.state.showBtn) ? (
                   <>
-                    <ViewInformation part={this.props.part} />
-                    <Button as={NavLink} to={`edit/${this.props.part._id}`} size='mini' icon='edit' />
+                    <Grid.Row>
+                      <ViewInformation part={this.props.part} />
+                    </Grid.Row>
+                    {this.props.currentUser ? 
+                      (<Grid.Row
+                        style={{ marginTop: '0.4rem'}}>
+                        <Button
+                          as={NavLink}
+                          to={`edit/${this.props.part._id}`}
+                          size='mini' icon='edit' 
+                          />
+                      </Grid.Row>)
+                      :
+                      ''
+                    }
                   </>
                 ) : <></>
                 }
@@ -49,6 +65,13 @@ class TaskCard extends React.Component {
 
 TaskCard.propTypes = {
   part: PropTypes.object.isRequired,
+  currentUser: PropTypes.bool.isRequired,
 };
 
-export default TaskCard;
+export default withTracker(() => {
+  // Check if the current user is in the admin role
+  const currentUser = Roles.userIsInRole(Meteor.userId(), 'admin');
+  return {
+    currentUser,
+  };
+})(TaskCard);

@@ -5,7 +5,7 @@ import { Roles } from 'meteor/alanning:roles';
 import { withTracker } from 'meteor/react-meteor-data';
 import { withRouter, NavLink } from 'react-router-dom';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, CardContent, Container, Header, Progress, Loader, Form, Button } from 'semantic-ui-react';
+import { Card, CardContent, Container, Header, Progress, Loader, Form, Button, Grid } from 'semantic-ui-react';
 import _ from 'lodash';
 import { Parts } from '../../api/parts/Parts';
 import TaskCard from '../components/TaskCard';
@@ -92,13 +92,27 @@ class ProjectBoard extends React.Component {
       }
     });
 
+  // sorts by field index normally, except moves -1s (new entries) to the back/bottom of list
+    const sortIndex = (a, b) => {
+      if (a.index === -1 && b.index === -1) {
+        return 0;
+      }
+      if (a.index === -1) {
+        return 1;
+      }
+      if (b.index === -1) {
+        return -1;
+      }
+      return a.index - b.index;
+    }
+
     // Update the states and mark that the issues have been loaded
     this.setState({
       loaded: true,
-      todo: todoParts,
-      progress: progressParts,
-      review: reviewParts,
-      done: doneParts,
+      todo: todoParts.sort(sortIndex),
+      progress: progressParts.sort(sortIndex),
+      review: reviewParts.sort(sortIndex),
+      done: doneParts.sort(sortIndex),
     });
   }
 
@@ -120,6 +134,15 @@ class ProjectBoard extends React.Component {
   /** If the subscription(s) have been received, render the page, otherwise show a loading icon. */
   render() {
     return (this.props.ready && this.props.parts) ? this.renderPage() : <Loader active>Getting data</Loader>;
+  }
+
+  // Updates part indices when dragging and reordering cols
+  updateIndices(partArrays) {
+    partArrays.forEach((arr) => {
+      arr.map((part, i) => {
+        Parts.collection.update(part._id, { $set: { index: i } });
+      });
+    });
   }
 
   renderPage() {
@@ -165,9 +188,7 @@ class ProjectBoard extends React.Component {
 
         // Setting the reordered list to be the new list
 
-        this.setState({ [source.droppableId]: items });
-
-        console.log({ [source.droppableId]: items });
+        this.setState({ [source.droppableId]:items }, () => this.updateIndices([items]));
 
         // Card is placed in a different column from origin
       } else {
@@ -187,10 +208,10 @@ class ProjectBoard extends React.Component {
         this.setState({
           [columnA]: output[columnA],
           [columnB]: output[columnB],
-        });
+        }, () => this.updateIndices([output[columnA], output[columnB]]));
 
-        // Edit DB entry when switching
-        Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) } });
+        // Edit part status when switching columns
+        Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) }})
       }
     };
 
@@ -267,8 +288,23 @@ class ProjectBoard extends React.Component {
               onClick={this.handleSearchClear}/>
             <Card>
               <Card.Content>
-                <Card.Header>To Do</Card.Header>
-                <Button as={NavLink} to='add' size='mini' icon='plus' />
+                <Card.Header>
+                  <Grid>
+                    <Grid.Row>
+                      <Grid.Column floated="left" width={11}>
+                        To Do
+                      </Grid.Column>
+                      {this.props.currentUser ?
+                      (<Grid.Column floated="left" >
+                        <Button 
+                          as={NavLink}
+                          to='add'
+                          size='mini'
+                          icon='plus' />
+                      </Grid.Column>) : ''}
+                    </Grid.Row>
+                  </Grid>
+                </Card.Header>
               </Card.Content>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId="todo">
@@ -308,7 +344,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
-                <Card.Header>In Progress</Card.Header>
+                <Card.Header style={{ marginBottom: '0.5rem' }}>In Progress</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId='progress'>
@@ -347,7 +383,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
-                <Card.Header>For Review</Card.Header>
+                <Card.Header style={{ marginBottom: '0.5rem' }}>For Review</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId='review'>
@@ -386,7 +422,7 @@ class ProjectBoard extends React.Component {
             </Card>
             <Card>
               <CardContent>
-                <Card.Header>Done (Advisor Only)</Card.Header>
+                <Card.Header style={{ marginBottom: '0.5rem' }}>Done (Advisor Only)</Card.Header>
               </CardContent>
               <Card.Content className='cardPanel'>
                 <Droppable droppableId='done' isDropDisabled={!this.props.currentUser}>

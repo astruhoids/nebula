@@ -1,11 +1,13 @@
 import React from 'react';
-import { Grid, Segment, Header, Form, Loader } from 'semantic-ui-react';
+import { Grid, Segment, Header, Form, Loader, Container } from 'semantic-ui-react';
 import swal from 'sweetalert';
 import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router';
+import { STLViewer } from 'react-stl-obj-viewer';
+import { config, S3 } from 'aws-sdk';
 import { Parts, statusValues } from '../../api/parts/Parts';
 
 /** Renders the Page for adding a document. */
@@ -19,8 +21,8 @@ class AddPart extends React.Component {
       assignee: [],
       designer: '',
       mechanism: [],
-      pdf: 'https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.pdf',
-      stl: 'https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.stl',
+      pdf: '',
+      stl: '',
       notes: '',
       status: statusValues[0],
       loading: false,
@@ -36,8 +38,8 @@ class AddPart extends React.Component {
       assignee: [],
       designer: '',
       mechanism: [],
-      pdf: 'https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.pdf',
-      stl: 'https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.stl',
+      pdf: '',
+      stl: '',
       notes: '',
       status: statusValues[0],
       loading: false,
@@ -45,18 +47,23 @@ class AddPart extends React.Component {
   }
 
   // On submit, insert the data.
-  submit() {
-    const { name, quantity, assignee, mechanism, notes, designer, status, pdf, stl } = this.state;
+  async submit() {
+    const { name, quantity, assignee, mechanism, notes, designer, status } = this.state;
     this.setState({ loading: true });
-    Parts.collection.insert({ name, quantity, assignee, mechanism, notes, designer, status, pdf, stl },
-      (error) => {
-        if (error) {
-          swal('Error', error.message, 'error').then(() => this.clear());
-        } else {
-          swal('Success', `${name} added successfully`, 'success').then(() => this.clear());
-          this.setState({ redirectToReferrer: true });
-        }
-      });
+    const uploads = await this.uploadFiles(this.state.files);
+    Promise.all(uploads).then((files) => {
+      const pdf = files.find(file => file.key.split('.').pop().toLowerCase() === 'pdf').Location;
+      const stl = files.find(file => file.key.split('.').pop().toLowerCase() === 'stl').Location;
+      Parts.collection.insert({ name, quantity, assignee, mechanism, notes, designer, status, pdf, stl },
+        (error) => {
+          if (error) {
+            swal('Error', error.message, 'error').then(() => this.clear());
+          } else {
+            swal('Success', `${name} added successfully`, 'success').then(() => this.clear());
+            this.setState({ redirectToReferrer: true });
+          }
+        });
+    });
   }
 
   componentDidUpdate() {
@@ -75,6 +82,50 @@ class AddPart extends React.Component {
     }
 
     return (this.props.ready) ? this.renderPage() : <Loader active>Getting data...</Loader>;
+  }
+
+  loadModel(e) {
+    const files = e.target.files;
+    this.setState({ files });
+    for (let i = 0; i < files.length; i++) {
+      const type = files[i].name.split('.').pop();
+      if (type.toLowerCase() === 'stl') {
+        this.setState({ stlFile: files[i] });
+      }
+    }
+  }
+
+  async uploadFiles(files) {
+    const promises = [];
+    config.update({ region: 'us-west-1' });
+    const s3 = new S3({
+      accessKeyId: Meteor.settings.public.s3.accessKeyId,
+      secretAccessKey: Meteor.settings.public.s3.secretAccessKey,
+      apiVersion: '2006-03-01',
+    });
+    let upload;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const type = file.name.split('.').pop();
+      const params = {
+        Bucket: 'astruhoidsnebula',
+        Key: `${this.state.name.replaceAll('\\g', '_')}.${type}`, // File name you want to save as in S3
+        Body: file,
+      };
+
+      upload = await s3.upload(params, function (err) {
+        if (err) {
+          throw err;
+        }
+      });
+
+      promises.push(upload.promise());
+
+      upload.on('httpUploadProgress', (progress) => {
+        this.setState({ loadingProgress: (Math.round((progress.loaded / progress.total) * 100)), loaded: i });
+      });
+    }
+    return promises;
   }
 
   renderPage() {
@@ -131,6 +182,26 @@ class AddPart extends React.Component {
               placeholder='Additional notes here...'
               value={notes}
               onChange={(e) => this.setState({ notes: e.target.value })}/>
+            <Form.Input
+              type='file'
+              multiple
+              label='Add STL and Schematic PDF'
+              accept='.pdf,.stl'
+              onChange={e => this.loadModel(e)}
+            />
+            { this.state.stlFile ?
+              <Container style={{ marginTop: '2rem' }}>
+                <Grid centered>
+                  <STLViewer
+                    file={this.state.stlFile}
+                    width={800}
+                    height={500}
+                    modelColor='#00acb1'
+                    backgroundColor='#EAEAEA'
+                  />
+                </Grid>
+              </Container>
+              : ''}
             <Form.Button content='Submit' type='submit' />
           </Form>
         </Segment>
