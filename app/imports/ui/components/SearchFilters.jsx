@@ -12,7 +12,7 @@ class SearchFilters extends React.Component {
             <Form.Group grouped>
               <Form.Input
                 onChange={this.props.onChange}
-                name="search"
+                label="Search by name"
                 className="icon"
                 icon="search"
                 placeholder="Search Parts"
@@ -22,6 +22,8 @@ class SearchFilters extends React.Component {
               {this.props.mechOptions.map(this.props.callbackfn)}
               <label>Assigned to...</label>
               {this.props.assigneeOptions.map(this.props.callbackfn)}
+              <label>Year</label>
+              {this.props.yearOptions.map(this.props.callbackfn)}
             </Form.Group>
           </Form>
         </CardContent>
@@ -48,6 +50,7 @@ SearchFilters.propTypes = {
   assigneeOptions: PropTypes.arrayOf(PropTypes.any),
   onClick: PropTypes.func,
   searchValue: PropTypes.string,
+  yearOptions: PropTypes.arrayOf(PropTypes.any),
 };
 
 export default SearchFilters;

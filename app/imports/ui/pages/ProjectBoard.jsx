@@ -245,6 +245,13 @@ class ProjectBoard extends React.Component {
       value: `${assignee.assignee}`,
     })), _.isEqual);
 
+    // Get filter options for years that are available
+    const yearOptions = _.uniqWith(this.props.parts.map(year => ({
+      key: `${year.year}`,
+      text: `${year.year}`,
+      value: `${year.year}`,
+    })), _.isEqual);
+
     // Filter results based on selected mechanism or assignee
     if (this.state.value !== '' || this.state.value.length !== 0) {
       for (let i = 0; i < this.state.value.length; i++) {
@@ -258,6 +265,11 @@ class ProjectBoard extends React.Component {
           progressParts = this.state.progress.filter(part => part.assignee.includes(this.state.value));
           reviewParts = this.state.review.filter(part => part.assignee.includes(this.state.value));
           doneParts = this.state.done.filter(part => part.assignee.includes(this.state.value));
+        } else if (yearOptions.some(e => e.key === this.state.value)) {
+          todoParts = this.state.todo.filter(part => part.year.toString() === this.state.value);
+          progressParts = this.state.progress.filter(part => part.year.toString() === this.state.value);
+          reviewParts = this.state.review.filter(part => part.year.toString() === this.state.value);
+          doneParts = this.state.done.filter(part => part.year.toString() === this.state.value);
         }
       }
     }
@@ -294,6 +306,7 @@ class ProjectBoard extends React.Component {
                 />
               )}
               assigneeOptions={assigneeOptions}
+              yearOptions={yearOptions}
               onClick={this.handleSearchClear}
               searchValue={this.state.search}/>
             <Card>
