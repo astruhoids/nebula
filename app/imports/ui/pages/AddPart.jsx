@@ -113,6 +113,7 @@ class AddPart extends React.Component {
         Body: file,
       };
 
+      // eslint-disable-next-line no-await-in-loop
       upload = await s3.upload(params, function (err) {
         if (err) {
           throw err;

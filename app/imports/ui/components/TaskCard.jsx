@@ -39,14 +39,14 @@ class TaskCard extends React.Component {
                     <Grid.Row>
                       <ViewInformation part={this.props.part} />
                     </Grid.Row>
-                    {this.props.currentUser ? 
+                    {this.props.currentUser ?
                       (<Grid.Row
-                        style={{ marginTop: '0.4rem'}}>
+                        style={{ marginTop: '0.4rem' }}>
                         <Button
                           as={NavLink}
                           to={`edit/${this.props.part._id}`}
-                          size='mini' icon='edit' 
-                          />
+                          size='mini' icon='edit'
+                        />
                       </Grid.Row>)
                       :
                       ''

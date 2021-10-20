@@ -7,8 +7,8 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { Redirect } from 'react-router';
 import { STLViewer } from 'react-stl-obj-viewer';
-import { Parts } from '../../api/parts/Parts';
 import { config, S3 } from 'aws-sdk';
+import { Parts } from '../../api/parts/Parts';
 
 /** Renders the Page for editing a single document. */
 class EditPart extends React.Component {
@@ -82,6 +82,7 @@ class EditPart extends React.Component {
         Body: file,
       };
 
+      // eslint-disable-next-line no-await-in-loop
       upload = await s3.upload(params, function (err) {
         if (err) {
           throw err;

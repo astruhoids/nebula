@@ -8,6 +8,7 @@
     "core-js": "^3.18.0",
     "graphql": "^14.5.8",
     "meteor-node-stubs": "^1.1.0",
+    "moment": "^2.29.1",
     "pdf-viewer-reactjs": "^2.2.3",
     "prop-types": "^15.7.2",
     "react": "^16.14.0",

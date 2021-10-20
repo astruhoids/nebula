@@ -1,6 +1,7 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 import { Tracker } from 'meteor/tracker';
+import moment from 'moment';
 
 export const statusValues = ['To Do', 'In Progress', 'For Review', 'Done'];
 /**
@@ -41,8 +42,8 @@ class PartsCollection {
       },
       index: {
         type: Number,
-        defaultValue: -1
-      }
+        defaultValue: -1,
+      },
     }, { tracker: Tracker });
     // Attach the schema to the collection, so all attempts to insert a document are checked against schema.
     this.collection.attachSchema(this.schema);

@@ -92,7 +92,7 @@ class ProjectBoard extends React.Component {
       }
     });
 
-  // sorts by field index normally, except moves -1s (new entries) to the back/bottom of list
+    // sorts by field index normally, except moves -1s (new entries) to the back/bottom of list
     const sortIndex = (a, b) => {
       if (a.index === -1 && b.index === -1) {
         return 0;
@@ -104,7 +104,7 @@ class ProjectBoard extends React.Component {
         return -1;
       }
       return a.index - b.index;
-    }
+    };
 
     // Update the states and mark that the issues have been loaded
     this.setState({
@@ -139,9 +139,9 @@ class ProjectBoard extends React.Component {
   // Updates part indices when dragging and reordering cols
   updateIndices(partArrays) {
     partArrays.forEach((arr) => {
-      arr.map((part, i) => {
-        Parts.collection.update(part._id, { $set: { index: i } });
-      });
+      arr.map((part, i) => (
+        Parts.collection.update(part._id, { $set: { index: i } })
+      ));
     });
   }
 
@@ -159,14 +159,23 @@ class ProjectBoard extends React.Component {
 
     // Converts droppableIds to valid status per the PartsCollection
     const toStatusValue = id => {
+      let output = '';
       switch (id) {
-      case 'todo': return 'To Do';
-      case 'progress': return 'In Progress';
-      case 'review': return 'For Review';
-      case 'done': return 'Done';
-      default:
-          // do nothing
+      case 'todo':
+        output = 'To Do';
+        break;
+      case 'progress':
+        output = 'In Progress';
+        break;
+      case 'review':
+        output = 'For Review';
+        break;
+      case 'done':
+        output = 'Done';
+        break;
+        // no default
       }
+      return output;
     };
 
     // When user stops dragging (aka releases card)
@@ -188,7 +197,7 @@ class ProjectBoard extends React.Component {
 
         // Setting the reordered list to be the new list
 
-        this.setState({ [source.droppableId]:items }, () => this.updateIndices([items]));
+        this.setState({ [source.droppableId]: items }, () => this.updateIndices([items]));
 
         // Card is placed in a different column from origin
       } else {
@@ -211,7 +220,7 @@ class ProjectBoard extends React.Component {
         }, () => this.updateIndices([output[columnA], output[columnB]]));
 
         // Edit part status when switching columns
-        Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) }})
+        Parts.collection.update(draggableId, { $set: { status: toStatusValue(destination.droppableId) } });
       }
     };
 
@@ -285,7 +294,7 @@ class ProjectBoard extends React.Component {
                 />
               )}
               assigneeOptions={assigneeOptions}
-              onClick={this.handleSearchClear}/>
+              onClick={this.handleSearchClear} />
             <Card>
               <Card.Content>
                 <Card.Header>
@@ -295,13 +304,13 @@ class ProjectBoard extends React.Component {
                         To Do
                       </Grid.Column>
                       {this.props.currentUser ?
-                      (<Grid.Column floated="left" >
-                        <Button 
-                          as={NavLink}
-                          to='add'
-                          size='mini'
-                          icon='plus' />
-                      </Grid.Column>) : ''}
+                        (<Grid.Column floated="left" >
+                          <Button
+                            as={NavLink}
+                            to='add'
+                            size='mini'
+                            icon='plus' />
+                        </Grid.Column>) : ''}
                     </Grid.Row>
                   </Grid>
                 </Card.Header>
