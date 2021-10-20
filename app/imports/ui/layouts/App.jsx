@@ -28,8 +28,8 @@ class App extends React.Component {
             <Route path="/signup" component={Signup}/>
             <Route path="/signout" component={Signout}/>
             <ProtectedRoute path="/board" component={ProjectBoard}/>
-            <ProtectedRoute path="/add" component={AddPart}/>
-            <ProtectedRoute path="/edit/:_id" component={EditPart}/>
+            <AdminProtectedRoute path="/add" component={AddPart}/>
+            <AdminProtectedRoute path="/edit/:_id" component={EditPart}/>
             <Route component={NotFound}/>
           </Switch>
           <Footer/>
