@@ -37,7 +37,7 @@ class TaskCard extends React.Component {
                 {(this.state.showBtn) ? (
                   <>
                     <Grid.Row>
-                      <ViewInformation part={this.props.part} />
+                      <ViewInformation part={this.props.part} deleteItem={this.props.deleteItem} userAdmin={this.props.currentUser}/>
                     </Grid.Row>
                     {this.props.currentUser ?
                       (<Grid.Row
@@ -66,6 +66,7 @@ class TaskCard extends React.Component {
 TaskCard.propTypes = {
   part: PropTypes.object.isRequired,
   currentUser: PropTypes.bool.isRequired,
+  deleteItem: PropTypes.func.isRequired,
 };
 
 export default withTracker(() => {

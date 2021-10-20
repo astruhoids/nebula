@@ -1,11 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Button, Header, Grid, Icon, List, Accordion } from 'semantic-ui-react';
+import swal from 'sweetalert';
 import { STLViewer } from 'react-stl-obj-viewer';
+import { Parts } from '../../api/parts/Parts';
 
-const ViewInformation = ({ part }) => {
+const ViewInformation = ({ part, deleteItem, userAdmin }) => {
   const [open, setOpen] = React.useState(false);
   const [stlView, setStlView] = React.useState(false);
+
+  const deletePart = (partId) => {
+    Parts.collection.remove({ _id: partId._id },
+      (error) => {
+        if (error) {
+          swal('Error', error.message, 'error');
+        } else {
+          swal('Success', `${partId.name} was deleted`, 'success').then(() => {
+            deleteItem(partId);
+          });
+        }
+      });
+  };
 
   return (
     <Modal
@@ -33,11 +48,11 @@ const ViewInformation = ({ part }) => {
             <Modal.Description>
               <Header>Files Attached:</Header>
               <List>
-                <List.Item><Button href={part.pdf} target='_blank' rel='noreferrer'><Icon name='file pdf'/>Open PDF</Button></List.Item>
+                <List.Item><Button href={part.pdf} target='_blank' rel='noreferrer'><Icon name='file pdf' />Open PDF</Button></List.Item>
                 <List.Item>
                   <Accordion>
                     <Accordion.Title>
-                      <Button onClick={() => setStlView(!stlView)}><Icon name='eye'/>Preview STL</Button>
+                      <Button onClick={() => setStlView(!stlView)}><Icon name='eye' />Preview STL</Button>
                     </Accordion.Title>
                     <Accordion.Content active={stlView}>
                       <STLViewer
@@ -59,12 +74,19 @@ const ViewInformation = ({ part }) => {
         <Button color='black' onClick={() => setOpen(false)}>
           Close
         </Button>
+        {userAdmin ?
+          <Button color='red' icon='trash' content='Delete' onClick={() => deletePart(part)} />
+          :
+          ''
+        }
       </Modal.Actions>
     </Modal >
   );
 };
 ViewInformation.propTypes = {
   part: PropTypes.object.isRequired,
+  deleteItem: PropTypes.func.isRequired,
+  userAdmin: PropTypes.bool.isRequired,
 };
 
 export default ViewInformation;

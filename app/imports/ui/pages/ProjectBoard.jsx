@@ -60,6 +60,8 @@ class ProjectBoard extends React.Component {
   constructor(props) {
     super(props);
     this.state = { value: '', search: '', loaded: false, todo: [], progress: [], review: [], done: [] };
+
+    this.deleteItem = this.deleteItem.bind(this);
   }
 
   /** Updating the issues from the Parts Collection */
@@ -114,6 +116,34 @@ class ProjectBoard extends React.Component {
       review: reviewParts.sort(sortIndex),
       done: doneParts.sort(sortIndex),
     });
+  }
+
+  deleteItem(part) {
+    let list;
+    let temp;
+
+    switch (part.status) {
+    case 'To Do':
+      list = this.state.todo;
+      temp = 'todo';
+      break;
+    case 'In Progress':
+      list = this.state.progress;
+      temp = 'progress';
+      break;
+    case 'For Review':
+      list = this.state.review;
+      temp = 'review';
+      break;
+    case 'Done':
+      list = this.state.done;
+      temp = 'done';
+      break;
+      // no default
+    }
+
+    const newList = list.filter((item) => item._id !== part._id);
+    this.setState({ [temp]: newList });
   }
 
   /** Checking if the component successfully updated */
@@ -295,7 +325,7 @@ class ProjectBoard extends React.Component {
               )}
               assigneeOptions={assigneeOptions}
               onClick={this.handleSearchClear}
-              searchValue={this.state.search}/>
+              searchValue={this.state.search} />
             <Card>
               <Card.Content>
                 <Card.Header>
@@ -335,7 +365,7 @@ class ProjectBoard extends React.Component {
                               {...providedItem.draggableProps}
                               {...providedItem.dragHandleProps}
                             >
-                              <TaskCard part={part} />
+                              <TaskCard part={part} deleteItem={this.deleteItem} />
                             </div>
                           )}
                         </Draggable>
@@ -374,7 +404,7 @@ class ProjectBoard extends React.Component {
                               {...providedItem.draggableProps}
                               {...providedItem.dragHandleProps}
                             >
-                              <TaskCard part={part} />
+                              <TaskCard part={part} deleteItem={this.deleteItem} />
                             </div>
                           )}
                         </Draggable>
@@ -413,7 +443,7 @@ class ProjectBoard extends React.Component {
                               {...providedItem.draggableProps}
                               {...providedItem.dragHandleProps}
                             >
-                              <TaskCard part={part} />
+                              <TaskCard part={part} deleteItem={this.deleteItem} />
                             </div>
                           )}
                         </Draggable>
@@ -454,7 +484,7 @@ class ProjectBoard extends React.Component {
                               {...providedItem.draggableProps}
                               {...providedItem.dragHandleProps}
                             >
-                              <TaskCard part={part} />
+                              <TaskCard part={part} deleteItem={this.deleteItem} />
                             </div>
                           )}
                         </Draggable>
