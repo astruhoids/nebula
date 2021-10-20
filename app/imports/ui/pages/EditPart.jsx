@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Loader, Header, Segment, Form, Container } from 'semantic-ui-react';
+import { Grid, Loader, Header, Segment, Form, Container, Progress } from 'semantic-ui-react';
 import swal from 'sweetalert';
 import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
@@ -78,7 +78,7 @@ class EditPart extends React.Component {
       const type = file.name.split('.').pop();
       const params = {
         Bucket: 'astruhoidsnebula',
-        Key: `${this.state.name.replaceAll('\\g', '_')}.${type}`, // File name you want to save as in S3
+        Key: `${this.state.name}.${type}`, // File name you want to save as in S3
         Body: file,
       };
 
@@ -112,9 +112,6 @@ class EditPart extends React.Component {
         notes: part.notes,
         status: part.status,
         loading: false,
-        mechanisms: _.flatten(_.uniq(this.props.parts.map(p => p.mechanism))).map((mech, index) => ({ key: `mechanism_${index}`, text: mech, value: mech })),
-        assignees: _.flatten(_.uniq(this.props.parts.map(p => p.assignee))).map((assign, index) => ({ key: `assignee_${index}`, text: assign, value: assign })),
-        designers: _.uniq(this.props.parts.map(p => p.designer)).map((assign, index) => ({ key: `designer_${index}`, text: assign, value: assign })),
       });
     }
   }
@@ -141,13 +138,19 @@ class EditPart extends React.Component {
 
   // Render the form. Use Uniforms: https://github.com/vazco/uniforms
   renderPage() {
-    const { name, quantity, assignee, mechanism, notes, mechanisms, assignees, designer, designers } = this.state;
+    const mechanisms = _.uniq(_.flatten(this.props.parts.map(part => part.mechanism))).map((mech, index) => ({ key: `mechanism_${index}`, text: mech, value: mech }));
+    const assignees = _.uniq(_.flatten(this.props.parts.map(part => part.assignee))).map((assign, index) => ({ key: `assignee_${index}`, text: assign, value: assign }));
+    const designers = _.uniq(this.props.parts.map(part => part.designer)).map((assign, index) => ({ key: `designer_${index}`, text: assign, value: assign }));
+    const { name, quantity, assignee, mechanism, notes, designer } = this.state;
 
     return (
       <Grid container centered>
         <Grid.Column>
-          <Header as="h2" textAlign="center" style={{ paddingTop: '15px', color: 'white' }}>Edit Stuff</Header>
+          <Header as="h2" textAlign="center" style={{ paddingTop: '15px', color: 'white' }}>Edit Part</Header>
           <Segment>
+            { this.state.loadingProgress ?
+              <Progress percent={this.state.loadingProgress} indicating />
+              : ''}
             <Form onSubmit={() => this.submit()}>
               <Form.Input name='name'
                 label='Name'

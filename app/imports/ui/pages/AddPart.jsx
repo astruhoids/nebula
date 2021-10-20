@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Segment, Header, Form, Loader, Container } from 'semantic-ui-react';
+import { Grid, Segment, Header, Form, Loader, Container, Progress } from 'semantic-ui-react';
 import swal from 'sweetalert';
 import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
@@ -66,16 +66,6 @@ class AddPart extends React.Component {
     });
   }
 
-  componentDidUpdate() {
-    if (!this.state.mechanisms && !this.state.assignees && !this.state.designers) {
-      this.setState({
-        mechanisms: _.flatten(_.uniq(this.props.parts.map(part => part.mechanism))).map((mech, index) => ({ key: `mechanism_${index}`, text: mech, value: mech })),
-        assignees: _.flatten(_.uniq(this.props.parts.map(part => part.assignee))).map((assign, index) => ({ key: `assignee_${index}`, text: assign, value: assign })),
-        designers: _.uniq(this.props.parts.map(part => part.designer)).map((assign, index) => ({ key: `designer_${index}`, text: assign, value: assign })),
-      });
-    }
-  }
-
   render() {
     if (this.state.redirectToReferrer) {
       return <Redirect to='/board' />;
@@ -109,7 +99,7 @@ class AddPart extends React.Component {
       const type = file.name.split('.').pop();
       const params = {
         Bucket: 'astruhoidsnebula',
-        Key: `${this.state.name.replaceAll('\\g', '_')}.${type}`, // File name you want to save as in S3
+        Key: `${this.state.name}.${type}`, // File name you want to save as in S3
         Body: file,
       };
 
@@ -130,11 +120,17 @@ class AddPart extends React.Component {
   }
 
   renderPage() {
-    const { name, quantity, assignee, mechanism, notes, loading, mechanisms, assignees, designer, designers } = this.state;
+    const mechanisms = _.uniq(_.flatten(this.props.parts.map(part => part.mechanism))).map((mech, index) => ({ key: `mechanism_${index}`, text: mech, value: mech }));
+    const assignees = _.uniq(_.flatten(this.props.parts.map(part => part.assignee))).map((assign, index) => ({ key: `assignee_${index}`, text: assign, value: assign }));
+    const designers = _.uniq(this.props.parts.map(part => part.designer)).map((assign, index) => ({ key: `designer_${index}`, text: assign, value: assign }));
+    const { name, quantity, assignee, mechanism, notes, loading, designer } = this.state;
     return <Grid container centered>
       <Grid.Column>
         <Header as="h2" textAlign="center" style={{ paddingTop: '15px', color: 'white' }}>Add Part</Header>
         <Segment>
+          { this.state.loadingProgress ?
+            <Progress percent={this.state.loadingProgress} indicating />
+            : ''}
           <Form loading={loading} onSubmit={() => this.submit()}>
             <Form.Input name='name'
               label='Name'
