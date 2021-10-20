@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Card, CardContent, Form } from 'semantic-ui-react';
+import { Card, CardContent, Form } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 /** Is shown on the project page. Card to display search options */
@@ -25,7 +25,7 @@ class SearchFilters extends React.Component {
           </Form>
         </CardContent>
         <Card.Content extra>
-          <Button
+          <Form.Button
             basic
             color="red"
             fluid
