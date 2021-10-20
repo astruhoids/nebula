@@ -13,19 +13,20 @@
     "index": "-1"
   },
   {
-    "name": "Another ToDo",
+    "name": "Claw",
     "quantity": "4",
     "assignee": ["John"],
     "designer": "admin@foo.com",
-    "mechanism": ["Another Mechanism"],
+    "mechanism": ["Climbing"],
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/2445_Camera_Mount/2445_Camera_Mount.STL",
     "notes": "3D Printer has no filament atm",
     "progress": "To Do",
+    "year": "2021",
     "index": "-1"
   },
   {
-    "name": "Part2",
+    "name": "Brackets",
     "quantity": "2",
     "assignee": ["Admin"],
     "designer": "john@foo.com",
@@ -34,14 +35,15 @@
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
     "notes": "Needs to be plasma cut",
     "status": "In Progress",
+    "year": "2021",
     "index": "-1"
   },
   {
-    "name": "Part4",
+    "name": "Funnel",
     "quantity": "2",
     "assignee": ["Admin"],
     "designer": "john@foo.com",
-    "mechanism": ["Review Mech"],
+    "mechanism": ["Intake"],
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
     "notes": "Needs to be plasma cut",
@@ -49,15 +51,16 @@
     "index": "-1"
   },
   {
-    "name": "Part3",
+    "name": "Gearboxes",
     "quantity": "2",
     "assignee": ["Admin"],
     "designer": "john@foo.com",
-    "mechanism": ["Completed Mech"],
+    "mechanism": ["Shooter"],
     "pdf": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.pdf",
     "stl": "https://astruhoidsnebula.s3.us-west-1.amazonaws.com/Part2/Part2.STL",
     "notes": "Needs to be plasma cut",
     "status": "Done",
+    "year": "2020",
     "index": "-1"
   }
 ]
