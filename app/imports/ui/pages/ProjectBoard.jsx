@@ -164,7 +164,8 @@ class ProjectBoard extends React.Component {
       case 'progress': return 'In Progress';
       case 'review': return 'For Review';
       case 'done': return 'Done';
-        // no default
+      default:
+          // do nothing
       }
     };
 
