@@ -155,7 +155,7 @@ class ProjectBoard extends React.Component {
     // Grabbing list based on the id
     const getList = id => this.state[idList[id]];
 
-    const totalIssues = _.sum([this.state.todo.length, this.state.progress.length, this.state.done.length]);
+    const totalIssues = _.sum([this.state.todo.length, this.state.progress.length, this.state.done.length, this.state.review.length]);
 
     // Converts droppableIds to valid status per the PartsCollection
     const toStatusValue = id => {
