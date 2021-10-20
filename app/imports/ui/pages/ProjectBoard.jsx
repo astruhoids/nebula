@@ -76,18 +76,18 @@ class ProjectBoard extends React.Component {
         part.key = part._id;
       }
       switch (part.status) {
-        case 'To Do':
-          todoParts.push(part);
-          break;
-        case 'In Progress':
-          progressParts.push(part);
-          break;
-        case 'For Review':
-          reviewParts.push(part);
-          break;
-        case 'Done':
-          doneParts.push(part);
-          break;
+      case 'To Do':
+        todoParts.push(part);
+        break;
+      case 'In Progress':
+        progressParts.push(part);
+        break;
+      case 'For Review':
+        reviewParts.push(part);
+        break;
+      case 'Done':
+        doneParts.push(part);
+        break;
         // no default
       }
     });
@@ -137,11 +137,12 @@ class ProjectBoard extends React.Component {
     // Converts droppableIds to valid status per the PartsCollection
     const toStatusValue = id => {
       switch (id) {
-        case 'todo': return 'To Do';
-        case 'progress': return 'In Progress';
-        case 'review': return 'For Review';
-        case 'done': return 'Done';
-        // no default
+      case 'todo': return 'To Do';
+      case 'progress': return 'In Progress';
+      case 'review': return 'For Review';
+      case 'done': return 'Done';
+      default:
+          // do nothing
       }
     };
 
