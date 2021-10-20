@@ -19,8 +19,11 @@ class EditPart extends React.Component {
       name: '',
       quantity: 0,
       assignee: [],
+      assignees: [],
       designer: '',
+      designers: [],
       mechanism: [],
+      mechanisms: [],
       pdf: '',
       stl: '',
       notes: '',
@@ -120,6 +123,13 @@ class EditPart extends React.Component {
     }
   }
 
+  componentDidMount() {
+    const mechanisms = _.uniq(_.flatten(this.props.parts.map(part => part.mechanism))).map((mech, index) => ({ key: `mechanism_${index}`, text: mech, value: mech }));
+    const assignees = _.uniq(_.flatten(this.props.parts.map(part => part.assignee))).map((assign, index) => ({ key: `assignee_${index}`, text: assign, value: assign }));
+    const designers = _.uniq(this.props.parts.map(part => part.designer)).map((assign, index) => ({ key: `designer_${index}`, text: assign, value: assign }));
+    this.setState({ mechanisms, assignees, designers });
+  }
+
   loadModel(e) {
     const files = e.target.files;
     this.setState({ files });
@@ -142,10 +152,7 @@ class EditPart extends React.Component {
 
   // Render the form. Use Uniforms: https://github.com/vazco/uniforms
   renderPage() {
-    const mechanisms = _.uniq(_.flatten(this.props.parts.map(part => part.mechanism))).map((mech, index) => ({ key: `mechanism_${index}`, text: mech, value: mech }));
-    const assignees = _.uniq(_.flatten(this.props.parts.map(part => part.assignee))).map((assign, index) => ({ key: `assignee_${index}`, text: assign, value: assign }));
-    const designers = _.uniq(this.props.parts.map(part => part.designer)).map((assign, index) => ({ key: `designer_${index}`, text: assign, value: assign }));
-    const { name, quantity, assignee, mechanism, notes, designer } = this.state;
+    const { name, quantity, assignee, mechanism, notes, designer, assignees, mechanisms, designers } = this.state;
 
     return (
       <Grid container centered>

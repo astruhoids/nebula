@@ -19,8 +19,11 @@ class AddPart extends React.Component {
       name: '',
       quantity: 0,
       assignee: [],
+      assignees: [],
       designer: '',
+      designers: [],
       mechanism: [],
+      mechanisms: [],
       pdf: '',
       stl: '',
       notes: '',
@@ -123,11 +126,15 @@ class AddPart extends React.Component {
     return promises;
   }
 
-  renderPage() {
+  componentDidMount() {
     const mechanisms = _.uniq(_.flatten(this.props.parts.map(part => part.mechanism))).map((mech, index) => ({ key: `mechanism_${index}`, text: mech, value: mech }));
     const assignees = _.uniq(_.flatten(this.props.parts.map(part => part.assignee))).map((assign, index) => ({ key: `assignee_${index}`, text: assign, value: assign }));
     const designers = _.uniq(this.props.parts.map(part => part.designer)).map((assign, index) => ({ key: `designer_${index}`, text: assign, value: assign }));
-    const { name, quantity, assignee, mechanism, notes, loading, designer } = this.state;
+    this.setState({ mechanisms, assignees, designers });
+  }
+
+  renderPage() {
+    const { name, quantity, assignee, mechanism, notes, loading, designer, mechanisms, assignees, designers } = this.state;
     return <Grid container centered>
       <Grid.Column>
         <Header as="h2" textAlign="center" style={{ paddingTop: '15px', color: 'white' }}>Add Part</Header>
