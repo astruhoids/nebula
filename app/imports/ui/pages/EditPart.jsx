@@ -35,32 +35,36 @@ class EditPart extends React.Component {
   // On successful submit, insert the data.
   async submit() {
     const { name, quantity, assignee, mechanism, notes, designer, status, stl, pdf, stlFile } = this.state;
-    const { _id } = this.props.part;
-    this.setState({ loading: true });
-    if (stlFile) {
-      const uploads = await this.uploadFiles(this.state.files);
-      Promise.all(uploads).then((files) => {
-        const newPdf = files.find(file => file.key.split('.').pop().toLowerCase() === 'pdf').Location;
-        const newStl = files.find(file => file.key.split('.').pop().toLowerCase() === 'stl').Location;
-        Parts.collection.update(_id, { $set: { name, quantity, assignee, mechanism, notes, designer, status, pdf: newPdf, stl: newStl } },
-          (error) => {
-            if (error) {
-              swal('Error', error.message, 'error').then(() => this.clear());
-            } else {
-              swal('Success', 'Item updated successfully', 'success');
-              this.setState({ redirectToReferrer: true });
-            }
-          });
-      });
+    if (name && quantity && assignee && mechanism && designer && status && stlFile) {
+      const { _id } = this.props.part;
+      this.setState({ loading: true });
+      if (stlFile) {
+        const uploads = await this.uploadFiles(this.state.files);
+        Promise.all(uploads).then((files) => {
+          const newPdf = files.find(file => file.Key.split('.').pop().toLowerCase() === 'pdf').Location;
+          const newStl = files.find(file => file.Key.split('.').pop().toLowerCase() === 'stl').Location;
+          Parts.collection.update(_id, { $set: { name, quantity, assignee, mechanism, notes, designer, status, pdf: newPdf, stl: newStl } },
+            (error) => {
+              if (error) {
+                swal('Error', error.message, 'error').then(() => this.clear());
+              } else {
+                swal('Success', 'Item updated successfully', 'success');
+                this.setState({ redirectToReferrer: true });
+              }
+            });
+        });
+      } else {
+        Parts.collection.update(_id, { $set: { name, quantity, assignee, mechanism, notes, designer, status, pdf, stl } }, (error) => {
+          if (error) {
+            swal('Error', error.message, 'error');
+          } else {
+            swal('Success', 'Item updated successfully', 'success');
+            this.setState({ redirectToReferrer: true });
+          }
+        });
+      }
     } else {
-      Parts.collection.update(_id, { $set: { name, quantity, assignee, mechanism, notes, designer, status, pdf, stl } }, (error) => {
-        if (error) {
-          swal('Error', error.message, 'error');
-        } else {
-          swal('Success', 'Item updated successfully', 'success');
-          this.setState({ redirectToReferrer: true });
-        }
-      });
+      swal('Error', 'Please enter all the required fields', 'error');
     }
   }
 
@@ -153,16 +157,19 @@ class EditPart extends React.Component {
               : ''}
             <Form onSubmit={() => this.submit()}>
               <Form.Input name='name'
+                required
                 label='Name'
                 placeholder='Camera Mount'
                 value={name}
                 onChange={(e) => this.setState({ name: e.target.value })} />
               <Form.Input name='quantity'
+                required
                 label='Quantity'
                 placeholder='1'
                 value={quantity}
                 onChange={(e) => this.setState({ quantity: e.target.value })} />
               <Form.Dropdown name='designer'
+                required
                 label='Designer'
                 options={designers || []}
                 search
@@ -173,6 +180,7 @@ class EditPart extends React.Component {
                 onAddItem={(e, { value }) => this.setState({ designers: designers.concat([{ key: `designer_${designers.length}`, text: value, value: value }]) })}
                 onChange={(e, { value }) => this.setState({ designer: value })} />
               <Form.Dropdown name='assignee'
+                required
                 label='Assignee'
                 options={assignees || []}
                 multiple
@@ -184,6 +192,7 @@ class EditPart extends React.Component {
                 onAddItem={(e, { value }) => this.setState({ assignees: assignees.concat([{ key: `assignee_${assignees.length}`, text: value, value: value }]) })}
                 onChange={(e, { value }) => this.setState({ assignee: value })} />
               <Form.Dropdown name='mechanism'
+                required
                 label='Mechanism'
                 options={mechanisms || []}
                 multiple
@@ -201,6 +210,7 @@ class EditPart extends React.Component {
                 onChange={(e) => this.setState({ notes: e.target.value })} />
 
               <Form.Input
+                required
                 type='file'
                 multiple
                 label='Add STL and Schematic PDF'
@@ -212,6 +222,7 @@ class EditPart extends React.Component {
                   { this.state.stlFile ?
                     <STLViewer
                       file={this.state.stlFile}
+                      key={this.state.stlFile.name}
                       width={800}
                       height={500}
                       modelColor='#00acb1'

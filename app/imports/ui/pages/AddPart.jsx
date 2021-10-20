@@ -48,22 +48,26 @@ class AddPart extends React.Component {
 
   // On submit, insert the data.
   async submit() {
-    const { name, quantity, assignee, mechanism, notes, designer, status } = this.state;
-    this.setState({ loading: true });
-    const uploads = await this.uploadFiles(this.state.files);
-    Promise.all(uploads).then((files) => {
-      const pdf = files.find(file => file.key.split('.').pop().toLowerCase() === 'pdf').Location;
-      const stl = files.find(file => file.key.split('.').pop().toLowerCase() === 'stl').Location;
-      Parts.collection.insert({ name, quantity, assignee, mechanism, notes, designer, status, pdf, stl },
-        (error) => {
-          if (error) {
-            swal('Error', error.message, 'error').then(() => this.clear());
-          } else {
-            swal('Success', `${name} added successfully`, 'success').then(() => this.clear());
-            this.setState({ redirectToReferrer: true });
-          }
-        });
-    });
+    const { name, quantity, assignee, mechanism, notes, designer, status, files } = this.state;
+    if (name && quantity && assignee && mechanism && designer && status && files) {
+      this.setState({ loading: true });
+      const uploads = await this.uploadFiles(this.state.files);
+      Promise.all(uploads).then((f) => {
+        const pdf = f.find(file => file.Key.split('.').pop().toLowerCase() === 'pdf').Location;
+        const stl = f.find(file => file.Key.split('.').pop().toLowerCase() === 'stl').Location;
+        Parts.collection.insert({ name, quantity, assignee, mechanism, notes, designer, status, pdf, stl },
+          (error) => {
+            if (error) {
+              swal('Error', error.message, 'error').then(() => this.clear());
+            } else {
+              swal('Success', `${name} added successfully`, 'success').then(() => this.clear());
+              this.setState({ redirectToReferrer: true });
+            }
+          });
+      });
+    } else {
+      swal('Error', 'Please enter all the required fields', 'error');
+    }
   }
 
   render() {
@@ -133,16 +137,19 @@ class AddPart extends React.Component {
             : ''}
           <Form loading={loading} onSubmit={() => this.submit()}>
             <Form.Input name='name'
+              required
               label='Name'
               placeholder='Camera Mount'
               value={name}
               onChange={(e) => this.setState({ name: e.target.value })} />
             <Form.Input name='quantity'
+              required
               label='Quantity'
               placeholder='1'
               value={quantity}
               onChange={(e) => this.setState({ quantity: e.target.value })}/>
             <Form.Dropdown name='designer'
+              required
               label='Designer'
               search
               selection
@@ -153,6 +160,7 @@ class AddPart extends React.Component {
               onAddItem={(e, { value }) => this.setState({ designers: designers.concat([{ key: `designer_${designers.length}`, text: value, value: value }]) })}
               onChange={(e, { value }) => this.setState({ designer: value })}/>
             <Form.Dropdown name='assignee'
+              required
               label='Assignee'
               multiple
               search
@@ -164,6 +172,7 @@ class AddPart extends React.Component {
               onAddItem={(e, { value }) => this.setState({ assignees: assignees.concat([{ key: `assignee_${assignees.length}`, text: value, value: value }]) })}
               onChange={(e, { value }) => this.setState({ assignee: value })}/>
             <Form.Dropdown name='mechanism'
+              required
               label='Mechanism'
               multiple
               search
@@ -180,6 +189,7 @@ class AddPart extends React.Component {
               value={notes}
               onChange={(e) => this.setState({ notes: e.target.value })}/>
             <Form.Input
+              required
               type='file'
               multiple
               label='Add STL and Schematic PDF'
@@ -191,6 +201,7 @@ class AddPart extends React.Component {
                 <Grid centered>
                   <STLViewer
                     file={this.state.stlFile}
+                    key={this.state.stlFile.name}
                     width={800}
                     height={500}
                     modelColor='#00acb1'
