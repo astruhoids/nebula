@@ -1,292 +1,101 @@
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/landing-page.png)
 
-Meteor-application-template-react is a sample Meteor 2.4 application that illustrates:
+## What is Nebula?
+Nebula is a project board developed for [Meteor Hackathon 2021](https://impact.meteor.com/hackathon) where
+our group needed to develop an app that would have an impact on our community.
 
-  * A standard directory layout using 'imports/' as recommended in the [Meteor Guide](https://guide.meteor.com/structure.html)
-  * [Semantic UI React](https://react.semantic-ui.com/) for user interface.
-  * [Uniforms](https://uniforms.tools/) for form development.
-  * [alanning:roles](https://github.com/alanning/meteor-roles) to implement a special "Admin" user.
-  * Authorization, authentication, and registration using built-in Meteor packages.
-  * Initialization of users and data from a settings file.
-  * Alerts regarding success or failure of DB updates using [Sweet Alert](https://sweetalert.js.org/).
-  * Quality assurance using [ESLint](http://eslint.org) with packages to partially enforce the [Meteor Coding Standards](https://guide.meteor.com/code-style.html) and the [AirBnB Javascript Style Guide](https://github.com/airbnb/javascript).
+#### So why make a project board if you are have applications such as Trello?
 
-The goal of this template is to help you get quickly started doing Meteor development by providing a reasonable directory structure for development and deployment, a set of common extensions to the core framework, and boilerplate code to implement basic page display, navigation, forms, roles, and collection manipulation.
+The reason is that we wanted to develop a project board that was more dedicated to the workflow of teams for
+[FIRST Robotics Competition (FRC)](https://www.firstinspires.org/robotics/frc) as we all have been previous competitors
+of this organization. Our project board differs in that we have support for viewing `.stl` files, or 3D CAD
+models. We want to use our application for our old team [2445 Robokap](http://www.kapoleirobotics.com/Welcome.html) to
+make the managing of workflow easier for our advisor. Currently, they need to document each part in a spreadsheet, then
+go and look for an email with the schematics, print everything out before being able to assign it to a student. Now, all
+of this can be done in one central application, and also save on paper!
 
-To keep this codebase simple and small, some important capabilities are intentionally excluded from this template:
+## Benefits
+Our aim was to create a central hub where they can easily find their parts, download schematics, and view a 3D model
+of what students will be fabricating.
+### Benefits to students
+Constantly moving to different parts of the workshop students may leave their schematic in a place and have trouble
+finding it, or bringing it with them to the machine and spilling oil on it. The parts are also assigned through a schedule
+that is created by the advisor, but is they were not there, then the student would have to look through a pile of paper
+for the part they were assigned.
 
-  * Testing.
-  * Security (meteor-application-template-react enables the insecure packages)
+Our goal was to make it easy for students to view all parts, and filter it to show them what they need to specifically
+work on. This is aimed to make it easy for students to track their own progress on assigned parts and always have a way
+to hold a copy of the schematics.
 
-Examples of the these capabilities will be provided elsewhere.
+### Benefits to advisors
+Going through multiple applications and hundreds of emails to find a specific part's schematics can be time consuming.
+There are times when emergencies come up and the advisor needs to reassign parts to a student. During that time, there
+can be stress that can cause you to forget things such as marking down who is working on the part.
+
+Our goal is to make this process a lot easier so that there will be less stress during this period. This project board
+aims to make this process simpler for the advisor to have one application that has everything that is needed (i.e.,
+schematics, part name, quantity, etc.).
+
+Another goal is to make it simple to track the progress of the overall project. Instead of having to count how many parts
+on a spreadsheet are completed, in-progress, and still need to be done, we wanted a easy progress bar to show this. It
+can help with scheduling extra hours if more work needs to be completed in order to accommodate for times where there
+is a large portion of parts left to be done with less days remaining till the competition.
+
+## Managing Your Project With Nebula
+Our application is currently just a simple interface that allows all those benefits come to life for both the advisor
+and student. Views between the two may vary slightly, so we will notate advisor view only by adding an `*` (ex. edit*).
+
+All members will first be greeted with the landing page:
+![Landing Page](doc/landing-page.png)
+
+If you do not already have an account, you need to sign up for one:
+![Registration Page](doc/registration-page.png)
+
+Once registered, members will be redirected to the project board:
+![Project Board](doc/project-board.png)
+
+Hovering over the cards, you can get to different parts such as view more information:
+![View Information](doc/view-information.png)
+
+or edit*:
+![Edit Part](doc/edit-part.png)
+
+If advisors need to add a new part, they can click on the + icon on the 'To Do' column to see:
+![Add Part](doc/add-part.png)
+
+Finally, the members can move the parts into different columns by dragging and dropping:
+![Drag and drop](doc/drag-and-drop.png)
 
 ## Installation
-
-First, [install Meteor](https://www.meteor.com/install).
-
-Second, go to [https://github.com/ics-software-engineering/meteor-application-template-react](https://github.com/ics-software-engineering/meteor-application-template-react), and click the "Use this template" button. Complete the dialog box to create a new repository that you own that is initialized with this template's files.
-
-Third, go to your newly created repository, and click the "Clone or download" button to download your new GitHub repo to your local file system.  Using [GitHub Desktop](https://desktop.github.com/) is a great choice if you use MacOS or Windows.
-
-Fourth, cd into the app/ directory of your local copy of the repo, and install third party libraries with:
-
+Download and install the latest version of [Meteor](https://www.meteor.com/)
+Clone the repository to your local system and open the `app` directory in a terminal.
+To run locally:
 ```
-$ meteor npm install
-```
-
-## Running the system
-
-Once the libraries are installed, you can run the application by invoking the "start" script in the [package.json file](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/app/package.json):
-
-```
-$ meteor npm run start
-```
-
-The first time you run the app, it will create some default users and data. Here is the output:
-
-```
+meteor npm install
 meteor npm run start
-
-> meteor-application-template-react@ start /Users/philipjohnson/github/ics-software-engineering/meteor-application-template-react/app
-> meteor --no-release-check --settings ../config/settings.development.json
-
-[[[[[ ~/github/ics-software-engineering/meteor-application-template-react/app ]]]]]
-
-=> Started proxy.
-=> Started MongoDB.
-I20180227-13:33:02.716(-10)? Creating the default user(s)
-I20180227-13:33:02.742(-10)?   Creating user admin@foo.com.
-I20180227-13:33:02.743(-10)?   Creating user john@foo.com.
-I20180227-13:33:02.743(-10)? Creating default data.
-I20180227-13:33:02.743(-10)?   Adding: Basket (john@foo.com)
-I20180227-13:33:02.743(-10)?   Adding: Bicycle (john@foo.com)
-I20180227-13:33:02.743(-10)?   Adding: Banana (admin@foo.com)
-I20180227-13:33:02.744(-10)?   Adding: Boogie Board (admin@foo.com)
-=> Started your app.
-
-=> App running at: http://localhost:3000/
 ```
+Due to having access keys for our AWS S3 bucket, we have edited the `package.json` file to run locally with
+`settings.production.json` to have it ignored when committing changes to Github. Please see
+[.deploy/settings.sample.json](app/.deploy/settings.sample.json) for an example.
 
-
-### Note regarding "bcrypt warning":
-
-You might also get the following message when you run this application:
-
+## Deployment
+Nebula was deployed to [Galaxy](https://galaxy.meteor.com/). To deploy your own version, you should first login and see
 ```
-Note: you are using a pure-JavaScript implementation of bcrypt.
-While this implementation will work correctly, it is known to be
-approximately three times slower than the native implementation.
-In order to use the native implementation instead, run
+$ meteor login
+username: username
+password: 
 
-  meteor npm install --save bcrypt
-
-in the root directory of your application.
+Logged in as username. Thanks for being a Meteor developer!
 ```
-
-On some operating systems (particularly Windows), installing bcrypt is much more difficult than implied by the above message. Bcrypt is only used in Meteor for password checking, so the performance implications are negligible until your site has very high traffic. You can safely ignore this warning without any problems during initial stages of development.
-
-### Note regarding "MongoError: not master and slaveOk=false":
-
-Intermittently, you may see the following error message in the console when the system starts up:
-
+Once logged in, open the `app` directory in the terminal and run the following commands:
 ```
-MongoError: not master and slaveOk=false
-     at queryCallback (/Users/philipjohnson/.meteor/packages/npm-mongo/.3.1.1.1mmptof.qcqo++os+web.browser+web.browser.legacy+web.cordova/npm/node_modules/mongodb-core/lib/cursor.js:248:25)
-     at /Users/philipjohnson/.meteor/packages/npm-mongo/.3.1.1.1mmptof.qcqo++os+web.browser+web.browser.legacy+web.cordova/npm/node_modules/mongodb-core/lib/connection/pool.js:532:18
-     at _combinedTickCallback (internal/process/next_tick.js:131:7)
-     at process._tickDomainCallback (internal/process/next_tick.js:218:9)
+SET DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com
+meteor deploy --settings ..\config\settings.production.json [site name].meteorapp.com --free
 ```
-
-While irritating, this message appears to be harmless and [possibly related to a race condition between the development instance of Mongo and Meteor](https://github.com/meteor/meteor/issues/9026#issuecomment-330850366). By harmless, I mean that in most cases, the console goes on to display `App running at: http://localhost:3000/` and no problems occur during run time.
-
-### Viewing the running app
-
-If all goes well, the template application will appear at [http://localhost:3000](http://localhost:3000).  You can login using the credentials in [settings.development.json](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/config/settings.development.json), or else register a new account.
-
-### ESLint
-
-You can verify that the code obeys our coding standards by running ESLint over the code in the imports/ directory with:
-
-```
-meteor npm run lint
-```
-
-## Walkthrough
-
-The following sections describe the major features of this template.
-
-### Directory structure
-
-The top-level directory structure is:
-
-```
-app/        # holds the Meteor application sources
-config/     # holds configuration files, such as settings.development.json
-doc/        # holds developer documentation, user guides, etc.
-.gitignore  # don't commit IntelliJ project files, node_modules, and settings.production.json
-```
-
-This structure separates documentation files (such as screenshots) and configuration files (such as the settings files) from the actual Meteor application.
-
-The app/ directory has this structure:
-
-```
-client/
-  main.html      # The boilerplate HTML with a "root" div to be manipulated by React.
-  main.js        # import startup files.
-
-imports/
-  api/           # Define collections
-    stuff/       # The Stuffs collection definition
-  startup/       # Define code to run when system starts up (client-only, server-only, both)
-    client/
-    server/
-  ui/
-    layouts/     # Contains top-level layout (<App> component).
-    pages/       # Contains components for each page.
-    components/  # Contains page elements, some of which could appear on multiple pages.
-
-node_modules/    # managed by npm
-
-public/          # static assets (like images) can go here.
-
-server/
-   main.js       # import the server-side js files.
-```
-
-### Import conventions
-
-This system adheres to the Meteor guideline of putting all application code in the imports/ directory, and using client/main.js and server/main.js to import the code appropriate for the client and server in an appropriate order.
-
-### Application functionality
-
-The application implements a simple CRUD application for managing "Stuff", which is a Mongo Collection consisting of a name (String), a quantity (Number), and a condition (one of 'excellent', 'good', 'fair', or 'poor').
-
-By default, each user only sees the Stuff that they have created.  However, the settings file enables you to define default accounts.  If you define a user with the role "admin", then that user gets access to a special page which lists all the Stuff defined by all users.
-
-#### Landing page
-
-When you retrieve the app at http://localhost:3000, this is what should be displayed:
-
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/landing-page.png)
-
-The next step is to use the Login menu to either Login to an existing account or register a new account.
-
-#### Login page
-
-Clicking on the Login link, then on the Sign In menu item displays this page:
-
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/signin-page.png)
-
-#### Register page
-
-Alternatively, clicking on the Login link, then on the Sign Up menu item displays this page:
-
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/register-page.png)
-
-
-#### Landing (after Login) page, non-Admin user
-
-Once you log in (either to an existing account or by creating a new one), the navbar changes as follows:
-
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/landing-after-login-page.png)
-
-You can now add new Stuff documents, and list the Stuff you have created. Note you cannot see any Stuff created by other users.
-
-#### Add Stuff page
-
-After logging in, here is the page that allows you to add new Stuff:
-
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/add-stuff-page.png)
-
-#### List Stuff page
-
-After logging in, here is the page that allows you to list all the Stuff you have created:
-
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/list-stuff-page.png)
-
-You click the "Edit" link to go to the Edit Stuff page, shown next.
-
-#### Edit Stuff page
-
-After clicking on the "Edit" link associated with an item, this page displays that allows you to change and save it:
-
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/edit-stuff-page.png)
-
-#### Landing (after Login), Admin user
-
-You can define an "admin" user in the settings.json file. This user, after logging in, gets a special entry in the navbar:
-
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/admin-landing-page.png)
-
-#### Admin page (list all users stuff)
-
-To provide a simple example of a "super power" for Admin users, the Admin page lists all of the Stuff by all of the users:
-
-![](https://raw.githubusercontent.com/ics-software-engineering/meteor-application-template-react/master/doc/admin-list-stuff-page.png)
-
-Note that non-admin users cannot get to this page, even if they type in the URL by hand.
-
-### Collections
-
-The application implements a single Collection called "Stuffs". Each Stuffs document has the following fields: name, quantity, condition, and username.
-
-The Stuffs collection is defined in [imports/api/stuff/stuff.js](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/app/imports/api/stuff/stuff.js).
-
-The Stuffs collection is initialized in [imports/startup/server/Mongo.js](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/app/imports/startup/server/Mongo.js).
-
-### CSS
-
-The application uses the [React implementation of Semantic UI](http://react.semantic-ui.com/).
-
-### Routing
-
-For display and navigation among its four pages, the application uses [React Router](https://reacttraining.com/react-router/).
-
-Routing is defined in [imports/ui/layouts/App.jsx](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/app/imports/ui/layouts/App.jsx).
-
-
-### Authentication
-
-For authentication, the application uses the Meteor accounts package.
-
-When the application is run for the first time, a settings file (such as [config/settings.development.json](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/config/settings.development.json)) should be passed to Meteor. That will lead to a default account being created through the code in [imports/startup/server/accounts.js](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/app/imports/startup/server/accounts.js).
-
-The application allows users to register and create new accounts at any time.
-
-### Authorization
-
-Only logged in users can manipulate Stuff documents (but any registered user can manipulate any Stuff document, even if they weren't the user that created it.)
-
-### Configuration
-
-The [config](https://github.com/ics-software-engineering/meteor-application-template-react/tree/master/config) directory is intended to hold settings files.  The repository contains one file: [config/settings.development.json](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/config/settings.development.json).
-
-The [.gitignore](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/.gitignore) file prevents a file named settings.production.json from being committed to the repository. So, if you are deploying the application, you can put settings in a file named settings.production.json and it will not be committed.
-
-### Quality Assurance
-
-#### ESLint
-
-The application includes a [.eslintrc](https://github.com/ics-software-engineering/meteor-application-template-react/blob/master/app/.eslintrc) file to define the coding style adhered to in this application. You can invoke ESLint from the command line as follows:
-
-```
-[~/meteor-application-template-react/app]-> meteor npm run lint
-
-> meteor-application-template-react@ lint /Users/philipjohnson/meteor-application-template-react/app
-> eslint --quiet ./imports
-```
-
-ESLint should run without generating any errors.
-
-It's significantly easier to do development with ESLint integrated directly into your IDE (such as IntelliJ).
-
-## Screencasts
-
-For more information about this system, please watch one or more of the following screencasts. Note that the current source code might differ slightly from the code in these screencasts, but the changes should be very minor.
-
-  * [Walkthrough of system user interface (5 min)](https://www.youtube.com/watch?v=shYgqco1AUs)
-  * [Data and accounts structure and initialization (15 min)](https://www.youtube.com/watch?v=p9dvM6MdCGs)
-  * [Navigation, routing, pages, components (23 min)](https://www.youtube.com/watch?v=DAv0UjS0VjQ)
-  * [Forms (25 min)](https://www.youtube.com/watch?v=z02076QgDA8)
-  * [Authorization, authentication, and roles (10 min)](https://www.youtube.com/watch?v=_i1dgcP0zoI)
+For this to work, make sure you have a `settings.production.json` file. See
+[.deploy/settings.sample.json](app/.deploy/settings.sample.json) for an example.
+
+## AstrUHoids Developers
+- [Deshay Clemons](https://github.com/deshay-clemons)
+- [Luke McDonald](https://github.com/lukemcd9)
+- [Kevin Nguyen](https://github.com/kvndngyn)
+- [Gabriel Undan](https://github.com/gabrielundan)
